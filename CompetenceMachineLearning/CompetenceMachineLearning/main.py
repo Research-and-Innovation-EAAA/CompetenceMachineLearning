@@ -1,7 +1,7 @@
-import retriveFromDB
+import DBhandler
 
 if __name__ == '__main__':
-    app = retriveFromDB.RetriveFromDB()
+    app = DBhandler.DBHandler()
     app.retrive()
 
 
