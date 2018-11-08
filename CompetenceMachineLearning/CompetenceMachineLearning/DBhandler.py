@@ -2,16 +2,61 @@ import mysql.connector
 from mysql.connector import errorcode
 import os
 import yaml
-
+from Competence import Competence
 
 class DBHandler:
-    def retrive(self):
 
-        my_path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(my_path, "../config.yml")
-        config = yaml.safe_load(open(path))
+    my_path = os.path.abspath(os.path.dirname(__file__))
+    path = os.path.join(my_path, "../config.yml")
+    config = yaml.safe_load(open(path))
+    
+    
+    def loadCompetences(self):
         try:
-            cnx = mysql.connector.connect(**config)
+            cnx = mysql.connector.connect(**self.config)
+        except mysql.connector.Error as err:
+             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                 print("Something is wrong with your user name or password")
+             elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                 print("Database does not exist")
+             else:
+                 print(err)
+        else:
+            cursor = cnx.cursor()
+            query = "select _id, prefferredLabel from kompetence"
+            cursor.execute(query)
+            competenceList = []
+            for row in cursor:
+                competenceList.append(Competence(row[0], row[1]))
+            cursor.close()
+            cnx.close()
+            return competenceList
+
+
+    def loadAdverts(self, _id):
+        try:
+            cnx = mysql.connector.connect(**self.config)
+        except mysql.connector.Error as err:
+             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                 print("Something is wrong with your user name or password")
+             elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                 print("Database does not exist")
+             else:
+                 print(err)
+        else:
+            cursor = cnx.cursor()
+            query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(_id)
+            cursor.execute(query)
+            
+
+            cursor.close()
+            cnx.close()
+            return competenceList
+
+
+    def retrive(self):
+        try:
+            cnx = mysql.connector.connect(**self.config)
         except mysql.connector.Error as err:
              if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                  print("Something is wrong with your user name or password")
@@ -25,7 +70,6 @@ class DBHandler:
             fetchcursor.execute(query)
             for(name) in fetchcursor:
                 print("Regions Navn: " + name[0])
-
             fetchcursor.close()
             cnx.close()
 

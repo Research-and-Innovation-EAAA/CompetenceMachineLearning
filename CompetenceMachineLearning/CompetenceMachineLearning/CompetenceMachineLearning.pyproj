@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Competence.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="CompetenceMachineLearning.py" />
     <Compile Include="main.py" />
     <Compile Include="DBhandler.py" />
