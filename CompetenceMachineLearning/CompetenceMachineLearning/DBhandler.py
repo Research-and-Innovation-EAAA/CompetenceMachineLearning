@@ -3,6 +3,8 @@ from mysql.connector import errorcode
 import os
 import yaml
 from Competence import Competence
+import random
+
 
 class DBHandler:
 
@@ -33,7 +35,7 @@ class DBHandler:
             return competenceList
 
 
-    def loadAdverts(self, _id):
+    def loadAdvertData(self, _id):
         try:
             cnx = mysql.connector.connect(**self.config)
         except mysql.connector.Error as err:
@@ -47,11 +49,31 @@ class DBHandler:
             cursor = cnx.cursor()
             query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(_id)
             cursor.execute(query)
-            
+
+            trainingContainer = []
+            testContainer = []
+
+            i = cursor.rowcount
+            for row in cursor:
+                if i < cursor.rowcount*(6/10):
+                    trainingContainer.append(row)
+                else:
+                    testContainer.append(row)
 
             cursor.close()
             cnx.close()
-            return competenceList
+
+            #random.shuffle(array)
+
+            #SQL order_by RAND()     - Could be used to get kompetence-less annoncer from all over?
+
+            
+            trainingData = []
+            trainingLabels = []
+            testData = []
+            testLabels = []
+
+            return trainingData, trainingLabels, testData, testLabels
 
 
     def retrive(self):
