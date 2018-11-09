@@ -35,7 +35,7 @@ class DBHandler:
             return competenceList
 
 
-    def loadAdvertData(self, _id):
+    def loadAdvertData(self, competence):
         try:
             cnx = mysql.connector.connect(**self.config)
         except mysql.connector.Error as err:
@@ -47,33 +47,38 @@ class DBHandler:
                  print(err)
         else:
             cursor = cnx.cursor()
-            query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(_id)
+            query = "a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competence._id)
             cursor.execute(query)
 
-            trainingContainer = []
-            testContainer = []
+            trainingAdverts = [[]]
+            testingAdverts = [[]]
 
-            i = cursor.rowcount
+            i = 0
             for row in cursor:
                 if i < cursor.rowcount*(6/10):
-                    trainingContainer.append(row)
+                    trainingContainer.append(Advert(row[0], row[1], 1))
                 else:
-                    testContainer.append(row)
+                    testContainer.append(Advert(row[0], row[1], 1))
+                i += 1
 
+            q2 = "FIGURE ME OUT" #Testing queries in workbench. Problem: They take far too long to get the desired data. (More than 10 min)
+            cursor.execute(q2)
+
+            i = 0
+            for row in cursor:
+                if i < cursor.rowcount*(6/10):
+                    trainingContainer.append(Advert(row[0], row[1], 0))
+                else:
+                    testContainer.append(Advert(row[0], row[1], 0))
+                i += 1
+            
             cursor.close()
             cnx.close()
 
-            #random.shuffle(array)
-
-            #SQL order_by RAND()     - Could be used to get kompetence-less annoncer from all over?
-
+            random.shuffle(trainingContainer)
+            random.shuffle(testContainer)
             
-            trainingData = []
-            trainingLabels = []
-            testData = []
-            testLabels = []
-
-            return trainingData, trainingLabels, testData, testLabels
+            return trainingAdverts, testingAdverts
 
 
     def retrive(self):
