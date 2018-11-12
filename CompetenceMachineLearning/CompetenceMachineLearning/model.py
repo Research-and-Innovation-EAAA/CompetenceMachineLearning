@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import random
+import DBhandler
+from Competence import Competence
 
 class Model:
 
@@ -12,10 +14,21 @@ class Model:
         self.layerArray.append(layer)
 
     def createModel(self):
-        train_data = []
-        train_label = []
-        test_data = []
-        test_label = []
+        db = DBhandler.DBHandler()
+        training, test = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
+        train_data, train_label, test_data, test_label  = [], [], [], []
+        for x in training:
+            convert = x.numberFormat_body.split(' ')
+            while len(convert) < 1000:
+                convert.append(0)
+            train_data.append(convert[:1000])
+            train_label.append(x.matchCurrentCompetence)
+        for x in test:
+            convert = x.numberFormat_body.split(' ')
+            while len(convert) < 1000:
+                convert.append(0)
+            test_data.append(convert[:1000])
+            test_label.append(x.matchCurrentCompetence)
         #trainingSet = []
         #trainingLabels = []
         #testSet = []
@@ -41,21 +54,27 @@ class Model:
         #trainingLabels = np.array(trainingLabels)
         #testSet = np.array(testSet)
         #testLabels = np.array(testLabels)
+        print(len(test_data))
+        print(len(test_label))
+        
         train_data = keras.preprocessing.sequence.pad_sequences(train_data,
-                                                                value='index for padding is writte here, should come from dictionary',
+                                                                value=0,
                                                                 padding='post',
                                                                 maxlen=256)
 
-        test_data = keras.preprocessing.sequence.pad_sequences(train_data,
-                                                                value='index for padding is writte here, should come from dictionary',
+        test_data = keras.preprocessing.sequence.pad_sequences(test_data,
+                                                                value=0,
                                                                 padding='post',
                                                                 maxlen=256)
+        train_data = np.array(train_data)
+        train_label = np.array(train_label)
+        test_data = np.array(test_data)
+        test_label = np.array(test_label)
 
-        vocab_size = 1000
+        vocab_size = 1000000
         model = keras.Sequential()
         model.add(keras.layers.Embedding(vocab_size, 3))
         model.add(keras.layers.GlobalAveragePooling1D())
-        #model.add(keras.layers.Dense(1, input_shape=(2,), activation=tf.nn.relu))
         if len(self.layerArray) != 0:
             for x in self.layerArray:
                 model.add(x)
@@ -66,8 +85,13 @@ class Model:
                     loss='sparse_categorical_crossentropy',
                     metrics=['accuracy'])
 
-        #model.fit(trainingSet, trainingLabels, epochs = 20)
+        model.fit(train_data, train_label, epochs = 20)
+        print(len(test_data))
+        print(len(test_label))
 
-        #results = model.evaluate(testSet, testLabels)
+
+      
+
+        results = model.evaluate(test_data, test_label)
 
         print('Test accuracy:', results)
