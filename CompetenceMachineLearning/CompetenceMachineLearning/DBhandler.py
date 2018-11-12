@@ -5,6 +5,7 @@ import yaml
 from Competence import Competence
 from Advert import Advert 
 import random
+import json
 
 
 
@@ -98,13 +99,27 @@ class DBHandler:
         cursor.close()
         cnx.close()
 
-    def saveModel(self, model, competenceID):
+    def saveModel(self, modelName, model, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-
-
-
-
-        
+        modelJSON = str(model.to_json())
+        weightsJSON = str(json.dumps(model.get_weights().tolist()))
+        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + "name = " + modelName)
+        if (len(list(cursor)) > 0):
+            cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", " + modelJSON + ", " + weightsJSON + ", " + modelName + ")")
+        else:
+            cursor.execute("update machine_model set model = " + modelJSON + ", weights = " + weightsJSON + " where kompetence_id = " + str(competenceID) + " and name = " + modelName)
         cursor.close()
         cnx.close()
+        
+    def loadCompetencesWithModels(self):
+        #select all ids & preflabels from kompetence where kompetence id = model kompetence id
+        raise Exception("Error: This method hasn't been programmed yet!")
+        
+    def loadModelNames(self, competenceID):
+        #select all model names where kompetence id = kompetence id
+        raise Exception("Error: This method hasn't been programmed yet!")
+
+    def loadModel(self, name, competenceID):
+        #load model data for specified name/id pair
+        raise Exception("Error: This method hasn't been programmed yet!")
