@@ -70,8 +70,6 @@ class DBHandler:
             i += 1
         random.shuffle(trainingAdverts)
         random.shuffle(testingAdverts)
-        print(len(trainingAdverts))
-        print(len(testingAdverts))
         return trainingAdverts, testingAdverts
 
 
