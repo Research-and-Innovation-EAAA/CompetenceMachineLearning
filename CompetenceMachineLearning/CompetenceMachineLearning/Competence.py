@@ -3,7 +3,7 @@ class Competence(object):
     prefferredLabel = ""
 
     def __init__(self, _id, prefferredLabel):
-        self._id = id;
+        self._id = _id;
         self.prefferredLabel = prefferredLabel;
 
     def __str__(self):
