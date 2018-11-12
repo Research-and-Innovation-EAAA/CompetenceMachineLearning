@@ -17,7 +17,7 @@ class DBHandler:
         path = os.path.join(my_path, "../config.yml")
         config = yaml.safe_load(open(path))
         try:
-            cnx = mysql.connector.connect(**self.config)
+            cnx = mysql.connector.connect(**config)
         except mysql.connector.Error as err:
              if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                  print("Something is wrong with your user name or password")
@@ -44,7 +44,7 @@ class DBHandler:
     def loadAdvertData(self, competence):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        query = "a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competence._id)
+        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competence._id)
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
@@ -82,7 +82,7 @@ class DBHandler:
             query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id) values "
             j = 0
             done = False
-            while j < 950 and !done:
+            while (j < 950) and (not done):
                 if i + j < len(advertIDs):
                     if j == 0:
                         query += "(" + competenceID + ", " + advertIDs[i+j] + ")"
@@ -95,9 +95,4 @@ class DBHandler:
             i += 950
         cursor.close()
         cnx.close()
-
-
-
-
-
 
