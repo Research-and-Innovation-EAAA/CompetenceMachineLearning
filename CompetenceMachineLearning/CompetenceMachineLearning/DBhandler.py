@@ -48,26 +48,30 @@ class DBHandler:
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
+        correctAdverts = list(cursor)
         i = 0
-        for row in cursor:
-            if i < cursor.rowcount*(6/10):
+        for row in correctAdverts:
+            if i < len(correctAdverts)*(6/10):
                 trainingAdverts.append(Advert(row[0], row[1], 1))
             else:
                 testingAdverts.append(Advert(row[0], row[1], 1))
             i += 1
-        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != 13712 and a.numberFormat_body is not NULL group by a._id order by a._id desc limit 10000"
+        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != 13712 and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
+        incorrectAdverts = list(cursor)
+        cursor.close()
+        cnx.close()
         i = 0
-        for row in cursor:
-            if i < cursor.rowcount*(6/10):
+        for row in incorrectAdverts:
+            if i < len(incorrectAdverts)*(6/10):
                 trainingAdverts.append(Advert(row[0], row[1], 0))
             else:
                 testingAdverts.append(Advert(row[0], row[1], 0))
             i += 1
-        cursor.close()
-        cnx.close()
         random.shuffle(trainingAdverts)
         random.shuffle(testingAdverts)
+        print(len(trainingAdverts))
+        print(len(testingAdverts))
         return trainingAdverts, testingAdverts
 
 
@@ -96,3 +100,13 @@ class DBHandler:
         cursor.close()
         cnx.close()
 
+    def saveModel(self, model, competenceID):
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+
+
+
+
+        
+        cursor.close()
+        cnx.close()

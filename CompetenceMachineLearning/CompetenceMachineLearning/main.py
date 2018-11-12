@@ -5,8 +5,9 @@ import model
 if __name__ == '__main__':
     db = DBhandler.DBHandler()
 
-    test, test2 = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
-    print(test[0])
+    training, test = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
+    
+
 
 
     mod = model.Model()
