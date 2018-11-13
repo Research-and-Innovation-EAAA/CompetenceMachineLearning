@@ -15,7 +15,8 @@ class Model:
 
     def createModel(self):
         db = DBhandler.DBHandler()
-        training, test = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
+        training, test = db.loadAdvertData(Competence(12562, "engelsk"))
+        #training, test = db.loadAdvertData(CCompetence(13712, "Java (Computerprogrammering)"))
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
             convert = x.numberFormat_body.split(' ')
@@ -25,6 +26,8 @@ class Model:
             convert = x.numberFormat_body.split(' ')
             test_data.append(convert)
             test_label.append(x.matchCurrentCompetence)
+        
+        print(len(train_data))
 
         train_data = keras.preprocessing.sequence.pad_sequences(train_data,
                                                                 value=0,
@@ -44,24 +47,27 @@ class Model:
         if len(self.layerArray) != 0:
             for x in self.layerArray:
                 model.add(x)
-        model.add(keras.layers.Dense(10, activation=tf.nn.sigmoid))
+        model.add(keras.layers.Dropout(0.2))
+        model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
         model.summary()
 
         model.compile(optimizer=tf.train.AdamOptimizer(), 
-                    loss='sparse_categorical_crossentropy',
+                    loss='binary_crossentropy',
                     metrics=['accuracy'])
 
-        x_val = train_data[1200:]
-        partial_x_train = train_data[:1200]
+        x_val = train_data[15000:]
+        partial_x_train = train_data[:15000]
 
-        y_val = train_label[1200:]
-        partial_y_train = train_label[:1200]
+        y_val = train_label[15000:]
+        partial_y_train = train_label[:15000]
 
-        history = model.fit(partial_x_train, partial_y_train, epochs = 200, validation_data=(x_val, y_val))
+        history = model.fit(partial_x_train, partial_y_train, epochs = 5, validation_data=(x_val, y_val))
 
         results = model.evaluate(test_data, test_label)
 
         print('Test accuracy:', results)
+
+        db.saveModel("BananFlue1337", model, 12562)
 
         history_dict = history.history
         history_dict.keys()
