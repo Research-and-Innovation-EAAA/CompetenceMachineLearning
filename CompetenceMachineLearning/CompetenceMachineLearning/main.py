@@ -44,4 +44,5 @@ if __name__ == '__main__':
 
     mod = model.Model()
     mod.addStandardLayer(5)
+    mod.addStandardLayer(7)
     mod.createModel()

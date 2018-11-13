@@ -40,7 +40,7 @@ class Model:
                                                                 maxlen=1000)
  
 
-        vocab_size = 1000000
+        vocab_size = db.loadDictionaryLength()
         model = keras.Sequential()
         model.add(keras.layers.Embedding(vocab_size, 3, input_length=1000))
         model.add(keras.layers.GlobalAveragePooling1D())
@@ -61,13 +61,13 @@ class Model:
         y_val = train_label[15000:]
         partial_y_train = train_label[:15000]
 
-        history = model.fit(partial_x_train, partial_y_train, epochs = 3, validation_data=(x_val, y_val))
+        history = model.fit(partial_x_train, partial_y_train, epochs = 14, validation_data=(x_val, y_val))
 
         results = model.evaluate(test_data, test_label)
 
         print('Test accuracy:', results)
 
-        db.saveModel("BananFlue1337", model, 12562)
+        #db.saveModel("BananFlue1337", model, 12562)
 
         history_dict = history.history
         history_dict.keys()
