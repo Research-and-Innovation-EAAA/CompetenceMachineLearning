@@ -57,7 +57,7 @@ class DBHandler:
             else:
                 testingAdverts.append(Advert(row[0], row[1], 1))
             i += 1
-        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != 13712 and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
+        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competence._id) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
         cursor.close()
@@ -120,6 +120,9 @@ class DBHandler:
         cnx.close()
         
     def loadCompetencesWithModels(self):
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        cursor.execute("")
         #select all ids & preflabels from kompetence where kompetence id = model kompetence id
         raise Exception("Error: This method hasn't been programmed yet!")
         
