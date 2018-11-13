@@ -99,6 +99,13 @@ class DBHandler:
         cursor.close()
         cnx.close()
 
+    def loadDictionaryLength(self):
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        cursor.execute("select count(_id) from machine_word_dictionary")
+        return cursor.fetchone()[0]
+
+
     def saveModel(self, modelName, model, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
@@ -122,4 +129,5 @@ class DBHandler:
 
     def loadModel(self, name, competenceID):
         #load model data for specified name/id pair
+        #Figure out how to restore weights from JSON (Note: Quite important.)
         raise Exception("Error: This method hasn't been programmed yet!")
