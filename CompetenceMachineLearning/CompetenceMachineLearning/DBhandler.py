@@ -6,13 +6,13 @@ from Competence import Competence
 from Advert import Advert 
 import random
 import json
+import tensorflow
+from tensorflow import keras
 
 
 
 class DBHandler:
 
-    
-    
     def createConnection(self):
         my_path = os.path.abspath(os.path.dirname(__file__))
         path = os.path.join(my_path, "../config.yml")
@@ -122,15 +122,33 @@ class DBHandler:
     def loadCompetencesWithModels(self):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        cursor.execute("")
-        #select all ids & preflabels from kompetence where kompetence id = model kompetence id
-        raise Exception("Error: This method hasn't been programmed yet!")
+        cursor.execute("select k._id, k.prefferredLabel from kompetence k, machine_model mm where k._id = mm.kompetence_id group_by k._id")
+        competences = []
+        for row in cursor:
+            competences.append(Competence(row[0], row[1]))
+        return competences
         
     def loadModelNames(self, competenceID):
-        #select all model names where kompetence id = kompetence id
-        raise Exception("Error: This method hasn't been programmed yet!")
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID))
+        modelNames = []
+        for row in cursor:
+            modelNames.append(row[0])
+        return modelNames
 
     def loadModel(self, name, competenceID):
-        #load model data for specified name/id pair
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        cursor.execute("select model, weights from machine_model where name = " + name + " and kompetence_id = " + str(competenceID))
+        row = cursor.fetchone()
+        modelJSON = row[0]
+        weightsJSON = row[1]
+        model = keras.models.model_from_json(modelJSON)
+        if true:
+            #Attempt 1 at restoring weights:
+            weights = json.loads(weightsJSON)
+            model.load_weights(weights)
+            return model
+
         #Figure out how to restore weights from JSON (Note: Quite important.)
-        raise Exception("Error: This method hasn't been programmed yet!")
