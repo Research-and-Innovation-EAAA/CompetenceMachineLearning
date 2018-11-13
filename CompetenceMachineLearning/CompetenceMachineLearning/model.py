@@ -19,61 +19,27 @@ class Model:
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
             convert = x.numberFormat_body.split(' ')
-            while len(convert) < 1000:
-                convert.append(0)
-            train_data.append(convert[:1000])
+            train_data.append(convert)
             train_label.append(x.matchCurrentCompetence)
         for x in test:
             convert = x.numberFormat_body.split(' ')
-            while len(convert) < 1000:
-                convert.append(0)
-            test_data.append(convert[:1000])
+            test_data.append(convert)
             test_label.append(x.matchCurrentCompetence)
-        #trainingSet = []
-        #trainingLabels = []
-        #testSet = []
-        #testLabels = []
 
-        #for i in range(50000):
-        #    x = random.randint(0, 1)
-        #    y = random.randint(0, 1)
-        #    trainingSet.append([x, y])
-        #    if (x == 1 & y == 0) | (x == 0 & y == 1):
-        #        trainingLabels.append(1)
-        #    else:
-        #        trainingLabels.append(0)
-        #for i in range(1000):
-        #    x = random.randint(0, 1)
-        #    y = random.randint(0, 1)
-        #    testSet.append([x, y])
-        #    if (x == 1 & y == 0) | (x == 0 & y == 1):
-        #        testLabels.append(1)
-        #    else:
-        #        testLabels.append(0)
-        #trainingSet = np.array(trainingSet)
-        #trainingLabels = np.array(trainingLabels)
-        #testSet = np.array(testSet)
-        #testLabels = np.array(testLabels)
-        print(len(test_data))
-        print(len(test_label))
-        
         train_data = keras.preprocessing.sequence.pad_sequences(train_data,
                                                                 value=0,
                                                                 padding='post',
-                                                                maxlen=256)
+                                                                maxlen=1000)
 
         test_data = keras.preprocessing.sequence.pad_sequences(test_data,
                                                                 value=0,
                                                                 padding='post',
-                                                                maxlen=256)
-        train_data = np.array(train_data)
-        train_label = np.array(train_label)
-        test_data = np.array(test_data)
-        test_label = np.array(test_label)
+                                                                maxlen=1000)
+ 
 
         vocab_size = 1000000
         model = keras.Sequential()
-        model.add(keras.layers.Embedding(vocab_size, 3))
+        model.add(keras.layers.Embedding(vocab_size, 3, input_length=1000))
         model.add(keras.layers.GlobalAveragePooling1D())
         if len(self.layerArray) != 0:
             for x in self.layerArray:
@@ -85,13 +51,48 @@ class Model:
                     loss='sparse_categorical_crossentropy',
                     metrics=['accuracy'])
 
-        model.fit(train_data, train_label, epochs = 20)
-        print(len(test_data))
-        print(len(test_label))
+        x_val = train_data[1200:]
+        partial_x_train = train_data[:1200]
 
+        y_val = train_label[1200:]
+        partial_y_train = train_label[:1200]
 
-      
+        history = model.fit(partial_x_train, partial_y_train, epochs = 200, validation_data=(x_val, y_val))
 
         results = model.evaluate(test_data, test_label)
 
         print('Test accuracy:', results)
+
+        history_dict = history.history
+        history_dict.keys()
+
+        import matplotlib.pyplot as plt
+        acc = history.history['acc']
+        val_acc = history.history['val_acc']
+        loss = history.history['loss']
+        val_loss = history.history['val_loss']
+        epochs = range(1, len(acc) + 1)
+        # "bo" is for "blue dot"
+
+        plt.plot(epochs, loss, 'bo', label='Training loss')
+        # b is for "solid blue line"
+        plt.plot(epochs, val_loss, 'b', label='Validation loss')
+        plt.title('Training and validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+
+        plt.show()
+
+        plt.clf()   # clear figure
+        acc_values = history_dict['acc']
+        val_acc_values = history_dict['val_acc']
+
+        plt.plot(epochs, acc, 'bo', label='Training acc')
+        plt.plot(epochs, val_acc, 'b', label='Validation acc')
+        plt.title('Training and validation accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+
+        plt.show()
