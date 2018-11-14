@@ -8,6 +8,7 @@ import random
 import json
 import tensorflow
 from tensorflow import keras
+import numpy
 
 
 
@@ -110,7 +111,9 @@ class DBHandler:
         cnx = self.createConnection()
         cursor = cnx.cursor()
         modelJSON = str(model.to_json())
-        weightsJSON = str(json.dumps(model.get_weights().tolist()))
+        print(model.get_weights())
+        weightsJSON = json.dump(model.get_weights().tolist())
+
         cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + "name = " + modelName)
         if (len(list(cursor)) > 0):
             cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", " + modelJSON + ", " + weightsJSON + ", " + modelName + ")")
