@@ -120,9 +120,9 @@ class DBHandler:
 
         cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
         if (len(list(cursor)) > 0):
-            cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", " + modelJSON + ", " + weightsJSON + ", " + modelName + ")")
+            cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", '" + modelJSON + "', '" + weightsJSON + "', '" + modelName + "')")
         else:
-            cursor.execute("update machine_model set model = " + modelJSON + ", weights = " + weightsJSON + " where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
+            cursor.execute("update machine_model set model = '" + modelJSON + "', weights = '" + weightsJSON + "' where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
         cursor.close()
         cnx.close()
         
