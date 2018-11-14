@@ -155,10 +155,12 @@ class DBHandler:
         if True:
             #Attempt 1 at restoring weights:
             weights = json.loads(weightsJSON)
-            numpyWeights = numpy.empty()
+            tmp = []
             for list in weights:
-                numpyWeights.append(numpy.array(list))
-            model.load_weights(numpyWeights)
+                tmp.append(numpy.array(list))
+            numpyWeights = numpy.array(tmp)
+            print(numpyWeights)
+            model.set_weights(numpyWeights)
             return model
 
         #Figure out how to restore weights from JSON (Note: Quite important.)
