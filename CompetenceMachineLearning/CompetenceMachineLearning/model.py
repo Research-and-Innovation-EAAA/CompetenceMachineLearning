@@ -61,7 +61,8 @@ class Model:
         y_val = train_label[15000:]
         partial_y_train = train_label[:15000]
 
-        history = model.fit(partial_x_train, partial_y_train, epochs = 14, validation_data=(x_val, y_val))
+        history = model.fit(partial_x_train, partial_y_train, epochs = 1, validation_data=(x_val, y_val))
+        db.saveModel("test", model,12562 )
 
         results = model.evaluate(test_data, test_label)
 

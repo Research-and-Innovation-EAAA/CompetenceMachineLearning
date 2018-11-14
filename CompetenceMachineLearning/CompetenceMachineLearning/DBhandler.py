@@ -112,13 +112,19 @@ class DBHandler:
         cursor = cnx.cursor()
         modelJSON = str(model.to_json())
         print(model.get_weights())
-        weightsJSON = json.dump(model.get_weights().tolist())
+        numArray = model.get_weights()
+        listJson = [[]]
+        for x in numArray:
+            listJson.append(x.tolist())
+        weightsJSON = json.dumps(listJson)
 
-        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + "name = " + modelName)
+        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
         if (len(list(cursor)) > 0):
+            cursor = cnx.cursor()
             cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", " + modelJSON + ", " + weightsJSON + ", " + modelName + ")")
         else:
-            cursor.execute("update machine_model set model = " + modelJSON + ", weights = " + weightsJSON + " where kompetence_id = " + str(competenceID) + " and name = " + modelName)
+            cursor = cnx.cursor()
+            cursor.execute("update machine_model set model = " + modelJSON + ", weights = " + weightsJSON + " where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
         cursor.close()
         cnx.close()
         

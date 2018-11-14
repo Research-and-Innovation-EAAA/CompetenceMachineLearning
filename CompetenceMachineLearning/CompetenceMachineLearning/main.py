@@ -43,6 +43,4 @@ if __name__ == '__main__':
     #print('Trainings label lenght: '+ str(len(test_label)))
 
     mod = model.Model()
-    mod.addStandardLayer(5)
-    mod.addStandardLayer(7)
     mod.createModel()
