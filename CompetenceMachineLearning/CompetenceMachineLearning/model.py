@@ -55,14 +55,19 @@ class Model:
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
 
-        x_val = train_data[15000:]
-        partial_x_train = train_data[:15000]
+        train_data_1 = int((len(train_data)*(2/5)))
+        train_data_2 = int((len(train_data)*(3/5)))
+        train_label_1 = int((len(train_label)*(2/5)))
+        train_label_2 = int((len(train_label)*(3/5)))
 
-        y_val = train_label[15000:]
-        partial_y_train = train_label[:15000]
+        x_val = train_data[train_data_1:]
+        partial_x_train = train_data[:train_data_2]
+
+        y_val = train_label[train_label_1:]
+        partial_y_train = train_label[:train_label_2]
 
         history = model.fit(partial_x_train, partial_y_train, epochs = 1, validation_data=(x_val, y_val))
-        db.saveModel("test", model,12562 )
+        #db.saveModel("test", model,12562 )
 
         results = model.evaluate(test_data, test_label)
 
