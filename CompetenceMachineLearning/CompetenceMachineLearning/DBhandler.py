@@ -159,7 +159,8 @@ class DBHandler:
             for list in weights:
                 tmp.append(numpy.array(list))
             numpyWeights = numpy.array(tmp)
-            print(numpyWeights)
+            numpyWeights = numpy.delete(numpyWeights, 0, 0)
+            model.summary()
             model.set_weights(numpyWeights)
             return model
 

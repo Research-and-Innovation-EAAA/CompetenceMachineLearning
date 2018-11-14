@@ -15,8 +15,8 @@ class Model:
 
     def createModel(self):
         db = DBhandler.DBHandler()
-        training, test = db.loadAdvertData(Competence(12562, "engelsk"))
-        #training, test = db.loadAdvertData(CCompetence(13712, "Java (Computerprogrammering)"))
+        #training, test = db.loadAdvertData(Competence(12562, "engelsk"))
+        training, test = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
             convert = x.numberFormat_body.split(' ')
@@ -67,7 +67,7 @@ class Model:
         partial_y_train = train_label[:train_label_2]
 
         history = model.fit(partial_x_train, partial_y_train, epochs = 1, validation_data=(x_val, y_val))
-        #db.saveModel("test", model,12562 )
+        db.saveModel("Festabe", model, 13712)
 
         results = model.evaluate(test_data, test_label)
 
