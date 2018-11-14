@@ -111,7 +111,6 @@ class DBHandler:
         cnx = self.createConnection()
         cursor = cnx.cursor()
         modelJSON = str(model.to_json())
-        print(model.get_weights())
         numArray = model.get_weights()
         listJson = [[]]
         for x in numArray:
@@ -119,10 +118,11 @@ class DBHandler:
         weightsJSON = json.dumps(listJson)
 
         cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
-        if (len(list(cursor)) > 0):
+        if (len(list(cursor)) == 0):
             cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", '" + modelJSON + "', '" + weightsJSON + "', '" + modelName + "')")
         else:
             cursor.execute("update machine_model set model = '" + modelJSON + "', weights = '" + weightsJSON + "' where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
+        cnx.commit()
         cursor.close()
         cnx.close()
         
@@ -144,18 +144,21 @@ class DBHandler:
             modelNames.append(row[0])
         return modelNames
 
-    def loadModel(self, name, competenceID):
+    def loadModel(self, competenceID, name):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        cursor.execute("select model, weights from machine_model where name = " + name + " and kompetence_id = " + str(competenceID))
+        cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID))
         row = cursor.fetchone()
         modelJSON = row[0]
         weightsJSON = row[1]
         model = keras.models.model_from_json(modelJSON)
-        if true:
+        if True:
             #Attempt 1 at restoring weights:
             weights = json.loads(weightsJSON)
-            model.load_weights(weights)
+            numpyWeights = numpy.empty()
+            for list in weights:
+                numpyWeights.append(numpy.array(list))
+            model.load_weights(numpyWeights)
             return model
 
         #Figure out how to restore weights from JSON (Note: Quite important.)
