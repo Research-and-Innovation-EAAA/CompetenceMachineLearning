@@ -28,6 +28,11 @@ class Model:
         model.summary()
         return model
 
+    
+    def testModel(self, model, test_data, test_label):
+        results = model.evaluate(test_data, test_label)
+
+        print('Test accuracy:', results)
 
     def trainModel(self, model, kompetenceId, verboseMod, epoch ):
         db = DBhandler.DBHandler()
@@ -70,9 +75,11 @@ class Model:
 
         history = model.fit(partial_x_train, partial_y_train, epochs = int(epoch), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
-        results = model.evaluate(test_data, test_label)
+        self.testModel(model, test_data, test_label)
 
-        print('Test accuracy:', results)
+        #results = model.evaluate(test_data, test_label)
+
+        #print('Test accuracy:', results)
 
         #db.saveModel("BananFlue1337", model, 12562)
 
@@ -109,4 +116,5 @@ class Model:
         plt.legend()
 
         plt.show()
+
 
