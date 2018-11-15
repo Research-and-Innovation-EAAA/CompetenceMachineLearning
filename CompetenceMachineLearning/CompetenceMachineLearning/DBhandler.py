@@ -43,10 +43,10 @@ class DBHandler:
         return competenceList
 
 
-    def loadAdvertData(self, competence):
+    def loadAdvertData(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competence._id)
+        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID)
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
@@ -58,7 +58,7 @@ class DBHandler:
             else:
                 testingAdverts.append(Advert(row[0], row[1], 1))
             i += 1
-        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competence._id) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
+        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
         cursor.close()
@@ -107,7 +107,7 @@ class DBHandler:
         return cursor.fetchone()[0]
 
 
-    def saveModel(self, modelName, model, competenceID):
+    def saveKerasModel(self, modelName, model, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         modelJSON = str(model.to_json())
@@ -126,7 +126,7 @@ class DBHandler:
         cursor.close()
         cnx.close()
         
-    def loadCompetencesWithModels(self):
+    def loadCompetencesWithKerasModels(self):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         cursor.execute("select k._id, k.prefferredLabel from kompetence k, machine_model mm where k._id = mm.kompetence_id group_by k._id")
@@ -135,7 +135,7 @@ class DBHandler:
             competences.append(Competence(row[0], row[1]))
         return competences
         
-    def loadModelNames(self, competenceID):
+    def loadKerasModelNames(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID))
@@ -144,7 +144,7 @@ class DBHandler:
             modelNames.append(row[0])
         return modelNames
 
-    def loadModel(self, competenceID, name):
+    def loadKerasModel(self, competenceID, name):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID))
@@ -152,16 +152,12 @@ class DBHandler:
         modelJSON = row[0]
         weightsJSON = row[1]
         model = keras.models.model_from_json(modelJSON)
-        if True:
-            #Attempt 1 at restoring weights:
-            weights = json.loads(weightsJSON)
-            tmp = []
-            for list in weights:
-                tmp.append(numpy.array(list))
-            numpyWeights = numpy.array(tmp)
-            numpyWeights = numpy.delete(numpyWeights, 0, 0)
-            model.summary()
-            model.set_weights(numpyWeights)
-            return model
-
-        #Figure out how to restore weights from JSON (Note: Quite important.)
+        weights = json.loads(weightsJSON)
+        tmp = []
+        for list in weights:
+            tmp.append(numpy.array(list))
+        numpyWeights = numpy.array(tmp)
+        numpyWeights = numpy.delete(numpyWeights, 0, 0)
+        model.summary()
+        model.set_weights(numpyWeights)
+        return model

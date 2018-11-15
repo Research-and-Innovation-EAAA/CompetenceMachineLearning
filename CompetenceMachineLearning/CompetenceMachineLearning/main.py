@@ -79,7 +79,7 @@ if __name__ == '__main__':
     #mod.createModel()
 
 
-    model = db.loadModel(13712, "Festabe")
+    model = db.loadKerasModel(13712, "Festabe")
     runLoadedModel(model)
     
 

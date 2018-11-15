@@ -67,7 +67,7 @@ class Model:
         partial_y_train = train_label[:train_label_2]
 
         history = model.fit(partial_x_train, partial_y_train, epochs = 1, validation_data=(x_val, y_val))
-        db.saveModel("Festabe", model, 13712)
+        db.saveKerasModel("Festabe", model, 13712)
 
         results = model.evaluate(test_data, test_label)
 
