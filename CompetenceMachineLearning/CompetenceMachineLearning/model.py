@@ -3,6 +3,7 @@ from tensorflow import keras
 import numpy as np
 import random
 import DBhandler
+#from DBhandler import DBHandler as db
 from Competence import Competence
 
 class Model:
@@ -15,8 +16,22 @@ class Model:
 
     def createModel(self):
         db = DBhandler.DBHandler()
-        #training, test = db.loadAdvertData(Competence(12562, "engelsk"))
-        training, test = db.loadAdvertData(13712)
+        vocab_size = db.loadDictionaryLength()
+        model = keras.Sequential()
+        model.add(keras.layers.Embedding(vocab_size, 3, input_length=1000))
+        model.add(keras.layers.GlobalAveragePooling1D())
+        if len(self.layerArray) != 0:
+            for x in self.layerArray:
+                model.add(x)
+        model.add(keras.layers.Dropout(0.2))
+        model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
+        model.summary()
+        return model
+
+
+    def createModel1(self, model, kompetenceId, verboseMod, epoch ):
+        db = DBhandler.DBHandler()
+        training, test = db.loadAdvertData(kompetenceId)
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
             convert = x.numberFormat_body.split(' ')
@@ -38,36 +53,22 @@ class Model:
                                                                 value=0,
                                                                 padding='post',
                                                                 maxlen=1000)
- 
-
-        vocab_size = db.loadDictionaryLength()
-        model = keras.Sequential()
-        model.add(keras.layers.Embedding(vocab_size, 3, input_length=1000))
-        model.add(keras.layers.GlobalAveragePooling1D())
-        if len(self.layerArray) != 0:
-            for x in self.layerArray:
-                model.add(x)
-        model.add(keras.layers.Dropout(0.2))
-        model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
-        model.summary()
 
         model.compile(optimizer=tf.train.AdamOptimizer(), 
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
 
         train_data_1 = int((len(train_data)*(2/5)))
-        train_data_2 = int((len(train_data)*(3/5)))
         train_label_1 = int((len(train_label)*(2/5)))
-        train_label_2 = int((len(train_label)*(3/5)))
+      
 
-        x_val = train_data[train_data_1:]
-        partial_x_train = train_data[:train_data_2]
+        x_val = train_data[:train_data_1]
+        partial_x_train = train_data[train_data_1:]
 
-        y_val = train_label[train_label_1:]
-        partial_y_train = train_label[:train_label_2]
+        y_val = train_label[:train_label_1]
+        partial_y_train = train_label[train_label_1:]
 
-        history = model.fit(partial_x_train, partial_y_train, epochs = 1, validation_data=(x_val, y_val))
-        #db.saveKerasModel("Festabe", model, 13712)
+        history = model.fit(partial_x_train, partial_y_train, epochs = int(epoch), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
         results = model.evaluate(test_data, test_label)
 
@@ -108,3 +109,4 @@ class Model:
         plt.legend()
 
         plt.show()
+
