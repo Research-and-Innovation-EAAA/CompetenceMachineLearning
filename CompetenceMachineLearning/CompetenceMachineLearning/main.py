@@ -74,12 +74,12 @@ if __name__ == '__main__':
     #print('Trainings Data lenght: '+str(len(test_data)))
     #print('Trainings label lenght: '+ str(len(test_label)))
 
-    #mod = model.Model()
-    #mod.addStandardLayer(2)
-    #mod.createModel()
+    mod = model.Model()
+    mod.addStandardLayer(2)
+    mod.createModel()
 
 
-    model = db.loadKerasModel(13712, "Festabe")
-    runLoadedModel(model)
+    #model = db.loadKerasModel(13712, "Festabe")
+    #runLoadedModel(model)
     
 
