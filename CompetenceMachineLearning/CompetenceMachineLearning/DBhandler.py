@@ -11,7 +11,6 @@ from tensorflow import keras
 import numpy
 
 
-
 class DBHandler:
 
     def createConnection(self):
@@ -79,8 +78,7 @@ class DBHandler:
         cnx = self.createConnection()
         cursor = cnx.cursor()
         # There is a limit on the values clause, only 1000 rows can be inserted at a time. Making a loop to generate multiple queries as needed.
-        # No need to check if the kompetence-annonce match exists already, the unique indexon the table should prevent duplicate rows from being added.
-        # A seperate method may be desired to clear all matches of a competence, but it's not this one.
+        # No need to check if the kompetence-annonce match exists already, the unique index on the table should prevent duplicate rows from being added.
         i = 0
         while i < len(advertIDs):
             query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id) values "
@@ -97,6 +95,7 @@ class DBHandler:
                 j += 1
             cursor.execute(query)
             i += 950
+        cnx.commit()
         cursor.close()
         cnx.close()
 
@@ -158,6 +157,5 @@ class DBHandler:
             tmp.append(numpy.array(list))
         numpyWeights = numpy.array(tmp)
         numpyWeights = numpy.delete(numpyWeights, 0, 0)
-        model.summary()
         model.set_weights(numpyWeights)
         return model
