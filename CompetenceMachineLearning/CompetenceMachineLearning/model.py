@@ -29,7 +29,7 @@ class Model:
         return model
 
 
-    def createModel1(self, model, kompetenceId, verboseMod, epoch ):
+    def trainModel(self, model, kompetenceId, verboseMod, epoch ):
         db = DBhandler.DBHandler()
         training, test = db.loadAdvertData(kompetenceId)
         train_data, train_label, test_data, test_label  = [], [], [], []
