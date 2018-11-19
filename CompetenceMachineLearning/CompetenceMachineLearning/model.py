@@ -63,8 +63,8 @@ class Model:
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
 
-        train_data_1 = int((len(train_data)*(2/5)))
-        train_label_1 = int((len(train_label)*(2/5)))
+        train_data_1 = int((len(train_data)*(1/10)))
+        train_label_1 = int((len(train_label)*(1/10)))
       
 
         x_val = train_data[:train_data_1]
@@ -76,10 +76,6 @@ class Model:
         history = model.fit(partial_x_train, partial_y_train, epochs = int(epoch), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
         self.testModel(model, test_data, test_label)
-
-        #results = model.evaluate(test_data, test_label)
-
-        #print('Test accuracy:', results)
 
         #db.saveModel("BananFlue1337", model, 12562)
 

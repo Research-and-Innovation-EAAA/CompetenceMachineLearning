@@ -77,7 +77,7 @@ if __name__ == '__main__':
     mod = model.Model()
     mod.addStandardLayer(2)
     mod1 = mod.createModel()
-    mod.trainModel(mod1, 13712, 1, 30 )
+    mod.trainModel(mod1, 13712, 1, 60 )
 
 
     #model = db.loadKerasModel(13712, "Festabe")
