@@ -1,6 +1,7 @@
 import DBhandler
 from Competence import Competence
 import model
+import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
 
@@ -74,11 +75,13 @@ if __name__ == '__main__':
     #print('Trainings Data lenght: '+str(len(test_data)))
     #print('Trainings label lenght: '+ str(len(test_label)))
 
-    mod = model.Model()
-    mod.addStandardLayer(2)
-    mod1 = mod.createModel()
-    mod.trainModel(mod1, 13712, 1, 60 )
+    #mod = model.Model()
+    #mod.addStandardLayer(2)
+    #mod1 = mod.createModel()
+    #mod.trainModel(mod1, 13712, 1, 60 )
 
+    mod = MultipleOutputModel.MultipleOutputModel()
+    mod.trainModel()
 
     #model = db.loadKerasModel(13712, "Festabe")
     #runLoadedModel(model)

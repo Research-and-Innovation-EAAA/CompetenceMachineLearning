@@ -32,6 +32,10 @@
     <Compile Include="model.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MultipleAdverts.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MultipleOutputModel.py" />
     <Compile Include="__init__.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

@@ -4,6 +4,7 @@ import os
 import yaml
 from Competence import Competence
 from Advert import Advert 
+from MultipleAdverts import MultipleAdverts
 import random
 import json
 import tensorflow
@@ -159,3 +160,38 @@ class DBHandler:
         numpyWeights = numpy.delete(numpyWeights, 0, 0)
         model.set_weights(numpyWeights)
         return model
+
+    def loadAnnounceFromTestCats(self):
+        trainingAdverts = []
+        testingAdverts = []
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        query1 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =12551 or ak.kompetence_id = 12562 or ak.kompetence_id = 13727"
+        cursor.execute(query1)
+        correctAdverts = list(cursor)
+        i = 0
+        for row in correctAdverts:
+            if i < len(correctAdverts)*(6/10):
+                trainingAdverts.append(MultipleAdverts(row[0], row[1]))
+            else:
+                testingAdverts.append(MultipleAdverts(row[0], row[1]))
+
+        query2 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id !=12551 or ak.kompetence_id != 12562 or ak.kompetence_id != 13727 " + "limit " + str(len(correctAdverts))
+
+
+        cursor.execute(query2)
+        incorrectAdverts = list(cursor)
+        i = 0
+        for row in incorrectAdverts:
+            if i < len(incorrectAdverts)*(6/10):
+                trainingAdverts.append(MultipleAdverts(row[0], row[1]))
+            else:
+                testingAdverts.append(MultipleAdverts(row[0], row[1]))
+            i += 1
+        random.shuffle(trainingAdverts)
+        random.shuffle(testingAdverts)
+        cursor.close()
+        cnx.close()
+        return trainingAdverts, testingAdverts
+
+       
