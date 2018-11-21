@@ -74,6 +74,45 @@ class DBHandler:
         random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
+    def loadAdvertDataASCII(self, competenceID):
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.numberFormat_body is not null"
+        cursor.execute(query)
+        trainingAdverts = []
+        testingAdverts = []
+        correctAdverts = list(cursor)
+        i = 0
+        for row in correctAdverts:
+            chars = list(row[1])
+            numbers = []
+            for char in chars:
+                numbers.append(str(ord(str(char))))
+            if i < len(correctAdverts)*(6/10):
+                trainingAdverts.append(Advert(row[0], numbers, 1))
+            else:
+                testingAdverts.append(Advert(row[0], numbers, 1))
+            i += 1
+        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
+        cursor.execute(q2)
+        incorrectAdverts = list(cursor)
+        cursor.close()
+        cnx.close()
+        i = 0
+        for row in incorrectAdverts:
+            chars = list(row[1])
+            numbers = []
+            for char in chars:
+                numbers.append(str(ord(str(char))))
+            if i < len(incorrectAdverts)*(6/10):
+                trainingAdverts.append(Advert(row[0], numbers, 0))
+            else:
+                testingAdverts.append(Advert(row[0], numbers, 0))
+            i += 1
+        random.shuffle(trainingAdverts)
+        random.shuffle(testingAdverts)
+        return trainingAdverts, testingAdverts
+
 
     def storeMatches(self, competenceID, advertIDs):
         cnx = self.createConnection()
