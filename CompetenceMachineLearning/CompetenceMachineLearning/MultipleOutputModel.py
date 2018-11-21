@@ -11,6 +11,7 @@ import random
 
 
 
+
 from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import confusion_matrix
@@ -28,6 +29,10 @@ class MultipleOutputModel:
         db = DBhandler.DBHandler()
         training, test = db.loadAnnounceFromTestCats()
         train_data, train_label, test_data, test_label  = [], [], [], []
+        y_train, y_test =[], []
+        num_classes_array = []
+
+
 
         for x in training:
             #convert = x.numberFormat_body.split(' ')
@@ -52,15 +57,23 @@ class MultipleOutputModel:
         #print(train_label)
 
         # Use sklearn utility to convert label strings to numbered index
-        #encoder = LabelEncoder()
+        ##encoder = LabelEncoder()
+        ##for x in train_label:
+        ##    encoder.fit(x)
+        ##    y_train.append(encoder.transform(x))
+        ##for x in test_label:
+        ##    y_test.append(encoder.transform(x))
+        ##    #y_train = encoder.transform(train_label)
+        ##    #y_test = encoder.transform(test_label)
+
+
         #encoder.fit(train_label)
-        #y_train = encoder.transform(train_label)
-        #y_test = encoder.transform(test_label)
+
 
         df = pd.DataFrame(train_label)
         encoder = LabelEncoder()
-        encoder.fit(df.columns)
-        y_train = encoder.transform(df.columns.get_values())
+        encoder.fit(list(df))
+        y_train = encoder.transform(df.columns)
         y_test = encoder.transform(test_label)
 
         #v = DictVectorizer(sparse=False)
@@ -68,10 +81,14 @@ class MultipleOutputModel:
         #y_train = v.transform(train_label)
         #y_test = v.transform(test_label)
 
-        print('Number of classes: ', y_train)
+        #print('Number of classes: ', y_train)
 
 
         # Converts the labels to a one-hot representation
+        #num_classes_array = set(list(itertools.chain.from_iterable(y_train)))
+
+        #num_classes_array = list(itertools.chain.from_iterable(y_train))
+        #print(len(num_classes_array))
         num_classes = np.max(y_train) + 1
         y_train = keras.utils.to_categorical(y_train, num_classes)
         y_test = keras.utils.to_categorical(y_test, num_classes)
@@ -146,38 +163,6 @@ class MultipleOutputModel:
 
 
 
-            # This utility function is from the sklearn docs: http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-    #    def plot_confusion_matrix(cm, classes,
-    #                            title='Confusion matrix',
-    #                            cmap=plt.cm.Blues):
-    ##"""
-    ##This function prints and plots the confusion matrix.
-    ##Normalization can be applied by setting `normalize=True`.
-    ##"""
-
-    #        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
-    #        plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    #        plt.title(title, fontsize=30)
-    #        plt.colorbar()
-    #        tick_marks = np.arange(len(classes))
-    #        plt.xticks(tick_marks, classes, rotation=45, fontsize=22)
-    #        plt.yticks(tick_marks, classes, fontsize=22)
-
-    #        fmt = '.2f'
-    #        thresh = cm.max() / 2.
-    #        for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-    #            plt.text(j, i, format(cm[i, j], fmt),
-    #                    horizontalalignment="center",
-    #                    color="white" if cm[i, j] > thresh else "black")
-
-    #        plt.ylabel('True label', fontsize=25)
-    #        plt.xlabel('Predicted label', fontsize=25)
-
-    #    cnf_matrix = confusion_matrix(y_test_1d, y_pred_1d)
-    #    plt.figure(figsize=(24,20))
-    #    plot_confusion_matrix(cnf_matrix, classes=text_labels, title="Confusion matrix")
-    #    plt.show()
 
 
         
