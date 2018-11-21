@@ -1,9 +1,12 @@
 import DBhandler
 from Competence import Competence
 import model
+import ASCIIModel
 import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
+import json
+import matplotlib.pyplot as plt
 
 def runLoadedModel(model):
     #training, test = db.loadAdvertData(Competence(12562, "engelsk"))
@@ -38,47 +41,18 @@ def runLoadedModel(model):
 if __name__ == '__main__':
     db = DBhandler.DBHandler()
 
-    #training, test = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
-    #train_data, train_label, test_data, test_label  = [], [], [], []
-    #con = 'Dette er en splittet streng'
-    #erLigeMed10 = '1 2 3 4 5 6 7 8 9 10'
-    #over10 = '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15'
-    #splitCon = con.split(' ')
-    #while len(splitCon) < 10:
-    #    splitCon.append('add')
-    #splitCon = splitCon[:10]
+    # Some kompetence ids for testing: 
+    # 13712 - Java (computerprogrammering)
+    # 12561 - Dansk
+    # 12562 - Engelsk
 
-    #print(splitCon)
-    #print(len(splitCon))
-    #for x in training:
-    #        convert = x.numberFormat_body.split(' ')
-    #        #while len(convert) < 1000:
-    #        #    convert.append(0)
-    #        train_data.append(convert[:4])
-    #        train_label.append(x.matchCurrentCompetence)
-  
-    #print(len(training))
-    #print(train_data[0])
-    #print(training[0])
-    #print(train_data[2])
-    #print(training[2])
-    #print(train_data[5])
-    #print(training[5])
-    #print(training[1]._id)
-    #for x in training:
-    #    train_data.append(x.numberFormat_body)
-    #    train_label.append(x.matchCurrentCompetence)
-    #for x in test:
-    #    test_data.append(x.numberFormat_body)
-    #    test_label.append(x.matchCurrentCompetence)
-
-    #print('Trainings Data lenght: '+str(len(test_data)))
-    #print('Trainings label lenght: '+ str(len(test_label)))
-
-    #mod = model.Model()
-    #mod.addStandardLayer(2)
-    #mod1 = mod.createModel()
-    #mod.trainModel(mod1, 13712, 1, 60 )
+    mod = ASCIIModel.ASCIIModel()
+    mod.addStandardLayer(32)
+    mod.addDropoutLayer(0.1)
+    mod.addStandardLayer(32)
+    mod.addDropoutLayer(0.1)
+    mod1 = mod.createModel()
+    mod.trainModel(mod1, 12561, 1, 10)
 
     mod = MultipleOutputModel.MultipleOutputModel()
     mod.trainModel()
@@ -86,4 +60,6 @@ if __name__ == '__main__':
     #model = db.loadKerasModel(13712, "Festabe")
     #runLoadedModel(model)
     
+
+
 
