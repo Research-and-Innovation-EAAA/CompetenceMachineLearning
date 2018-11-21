@@ -9,8 +9,9 @@ from SingleCompetenceModel import SingleCompetenceModel
 class NumberFormatModel(SingleCompetenceModel):
 
     def __init__(self, name, competenceID):
-        MMLModelContainer.__init__(name, competenceID)
+        SingleCompetenceModel.__init__(self, name, competenceID)
         self.modelType = "NumberFormatted"
+        db = DBhandler.DBHandler()
 
     def createModel(self):
         db = DBhandler.DBHandler()
@@ -21,14 +22,12 @@ class NumberFormatModel(SingleCompetenceModel):
         if len(self.layerArray) != 0:
             for x in self.layerArray:
                 model.add(x)
-        model.add(keras.layers.Dropout(0.2))
         model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
         model.summary()
-        return model
+        self.model = model
 
-    def trainModel(self, model, kompetenceId, verboseMod, epoch ):
-        db = DBhandler.DBHandler()
-        training, test = db.loadAdvertDataNumberFormat(kompetenceId)
+    def trainModel(self, verboseMod, epochs):
+        training, test = self.db.loadAdvertDataNumberFormat(self.competenceID)
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
             convert = x.numberFormat_body.split(' ')
@@ -51,7 +50,7 @@ class NumberFormatModel(SingleCompetenceModel):
                                                                 padding='post',
                                                                 maxlen=1000)
 
-        model.compile(optimizer=tf.train.AdamOptimizer(), 
+        self.model.compile(optimizer=tf.train.AdamOptimizer(), 
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
 
@@ -65,13 +64,14 @@ class NumberFormatModel(SingleCompetenceModel):
         y_val = train_label[:train_label_1]
         partial_y_train = train_label[train_label_1:]
 
-        history = model.fit(partial_x_train, partial_y_train, epochs = int(epoch), verbose=int(verboseMod), validation_data=(x_val, y_val))
+        #TODO: Figure out why it suddenly stops at a seemingly random point.
+        history = self.model.fit(partial_x_train, partial_y_train, epochs = int(epochs), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
-        results = model.evaluate(test_data, test_label)
+        results = self.model.evaluate(test_data, test_label)
 
         print('Test accuracy:', results)
 
-        #db.saveModel("BananFlue1337", model, 12562)
+        #db.saveModel("BananFlue1337", self.model, 12562)
 
         history_dict = history.history
         history_dict.keys()

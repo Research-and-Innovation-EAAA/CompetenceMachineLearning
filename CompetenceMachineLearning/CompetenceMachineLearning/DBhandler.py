@@ -49,7 +49,7 @@ class DBHandler:
     def loadAdvertDataNumberFormat(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID)
+        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.numberFormat_body is not NULL"
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []

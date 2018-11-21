@@ -1,4 +1,6 @@
 import DBhandler
+import tensorflow as tf
+from tensorflow import keras
 
 class SingleCompetenceModel(object):
     layerArray = []
@@ -11,7 +13,7 @@ class SingleCompetenceModel(object):
     def __init__(self, name, competenceID):
         self.name = name
         self.competenceID = competenceID
-        db = DBhandler.DBHandler()
+        self.db = DBhandler.DBHandler()
 
     def addStandardLayer(self, units):
         layer = keras.layers.Dense(units, activation=tf.nn.relu)

@@ -1,20 +1,19 @@
-import tensorflow as tf
-from tensorflow import keras
 import numpy
 import random
 import DBhandler
 from Competence import Competence
 import matplotlib.pyplot as plt
 from SingleCompetenceModel import SingleCompetenceModel
+import tensorflow as tf
+from tensorflow import keras
 
 
 class ASCIIModel(SingleCompetenceModel):
 
     
     def __init__(self, name, competenceID):
-        MMLModelContainer.__init__(name, competenceID)
+        SingleCompetenceModel.__init__(self, name, competenceID)
         self.modelType = "ASCII"
-
 
     def createModel(self):
         model = keras.Sequential()
@@ -27,8 +26,8 @@ class ASCIIModel(SingleCompetenceModel):
         model.summary()
         self.model = model
 
-    def trainModel(self, kompetenceId, verboseMod, epoch ):
-        training, test = self.db.loadAdvertDataASCII(kompetenceId)
+    def trainModel(self, verboseMod, epoch ):
+        training, test = self.db.loadAdvertDataASCII(self.competenceID)
 
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
