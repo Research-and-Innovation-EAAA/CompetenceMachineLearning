@@ -46,16 +46,16 @@ if __name__ == '__main__':
     # 12561 - Dansk
     # 12562 - Engelsk
 
-    mod = ASCIIModel("test")
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
-    mod.createModel()
-    mod.trainModel(12561, 1, 10)
+    #mod = ASCIIModel("test")
+    #mod.addStandardLayer(32)
+    #mod.addDropoutLayer(0.1)
+    #mod.addStandardLayer(32)
+    #mod.addDropoutLayer(0.1)
+    #mod.createModel()
+    #mod.trainModel(12561, 1, 10)
 
-    #mod = MultipleOutputModel.MultipleOutputModel()
-    #mod.trainModel()
+    mod = MultipleOutputModel.MultipleOutputModel()
+    mod.trainModel()
 
     #model = db.loadKerasModel(13712, "Festabe")
     #runLoadedModel(model)
