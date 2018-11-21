@@ -1,7 +1,7 @@
 class MultipleAdverts(object):
     #_id = 0
     searchable_body = ""
-    kompetence = ""
+    kompetence = []
 
     def __init__(self, searchable_body, kompetence):
         #self._id = _id;

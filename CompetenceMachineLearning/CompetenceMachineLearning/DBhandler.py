@@ -166,28 +166,34 @@ class DBHandler:
         testingAdverts = []
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        query1 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =12551 or ak.kompetence_id = 12562 or ak.kompetence_id = 13727"
+        #query1 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =12551 or ak.kompetence_id = 12562 or ak.kompetence_id = 13727"
+        query1 ="SELECT a._id, a.searchable_body FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =150388 or ak.kompetence_id = 165432 or ak.kompetence_id = 13727"
         cursor.execute(query1)
-        correctAdverts = list(cursor)
+        searchableBodyCursor = list(cursor)
+        #correctAdverts = list(cursor)
         i = 0
-        for row in correctAdverts:
-            if i < len(correctAdverts)*(6/10):
-                trainingAdverts.append(MultipleAdverts(row[0], row[1]))
+        for row in searchableBodyCursor:
+            queryCompetencelist ="SELECT k.prefferredLabel FROM annonce_kompetence ak JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.annonce_id = " + str(row[0])
+            cursor.execute(queryCompetencelist)
+            competences = list(cursor)
+            if i < len(searchableBodyCursor)*(6/10):
+                trainingAdverts.append(MultipleAdverts(row[1], competences))
             else:
-                testingAdverts.append(MultipleAdverts(row[0], row[1]))
-
-        query2 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id !=12551 or ak.kompetence_id != 12562 or ak.kompetence_id != 13727 " + "limit " + str(len(correctAdverts))
+                testingAdverts.append(MultipleAdverts(row[1], competences))
 
 
-        cursor.execute(query2)
-        incorrectAdverts = list(cursor)
-        i = 0
-        for row in incorrectAdverts:
-            if i < len(incorrectAdverts)*(6/10):
-                trainingAdverts.append(MultipleAdverts(row[0], row[1]))
-            else:
-                testingAdverts.append(MultipleAdverts(row[0], row[1]))
-            i += 1
+        #query2 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id !=12551 or ak.kompetence_id != 12562 or ak.kompetence_id != 13727 " + "limit " + str(len(correctAdverts))
+
+
+        #cursor.execute(query2)
+        #incorrectAdverts = list(cursor)
+        #i = 0
+        #for row in incorrectAdverts:
+        #    if i < len(incorrectAdverts)*(6/10):
+        #        trainingAdverts.append(MultipleAdverts(row[0], row[1]))
+        #    else:
+        #        testingAdverts.append(MultipleAdverts(row[0], row[1]))
+        #    i += 1
         random.shuffle(trainingAdverts)
         random.shuffle(testingAdverts)
         cursor.close()

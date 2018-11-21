@@ -11,7 +11,8 @@ import random
 
 
 
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder
+from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import confusion_matrix
 
 from tensorflow import keras
@@ -45,14 +46,30 @@ class MultipleOutputModel:
         tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
 
         tokenize.fit_on_texts(train_data) # only fit on train
+        #print(tokenize.word_index)
         x_train = tokenize.texts_to_matrix(train_data)
         x_test = tokenize.texts_to_matrix(test_data)
+        #print(train_label)
 
         # Use sklearn utility to convert label strings to numbered index
+        #encoder = LabelEncoder()
+        #encoder.fit(train_label)
+        #y_train = encoder.transform(train_label)
+        #y_test = encoder.transform(test_label)
+
+        df = pd.DataFrame(train_label)
         encoder = LabelEncoder()
-        encoder.fit(train_label)
-        y_train = encoder.transform(train_label)
+        encoder.fit(df.columns)
+        y_train = encoder.transform(df.columns.get_values())
         y_test = encoder.transform(test_label)
+
+        #v = DictVectorizer(sparse=False)
+        #v.fit(train_label)
+        #y_train = v.transform(train_label)
+        #y_test = v.transform(test_label)
+
+        print('Number of classes: ', y_train)
+
 
         # Converts the labels to a one-hot representation
         num_classes = np.max(y_train) + 1
