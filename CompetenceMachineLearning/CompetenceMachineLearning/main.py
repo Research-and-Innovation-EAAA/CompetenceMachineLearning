@@ -1,6 +1,6 @@
 import DBhandler
 from Competence import Competence
-import NumberFormatModel
+from NumberFormatModel import NumberFormatModel
 from ASCIIModel import ASCIIModel
 import MultipleOutputModel
 import tensorflow as tf
@@ -45,14 +45,15 @@ if __name__ == '__main__':
     # 13712 - Java (computerprogrammering)
     # 12561 - Dansk
     # 12562 - Engelsk
+    # 13737 - C#
 
-    mod = ASCIIModel("test")
+    mod = NumberFormatModel("Testname", 12562)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.createModel()
-    mod.trainModel(12561, 1, 10)
+    mod.trainModel(1, 10)
 
     #mod = MultipleOutputModel.MultipleOutputModel()
     #mod.trainModel()
