@@ -59,7 +59,7 @@ class MultipleOutputModel:
 
         df = pd.DataFrame(train_label)
         encoder = LabelEncoder()
-        encoder.fit(df.columns)
+        encoder.fit(list(df))
         y_train = encoder.transform(df.columns.get_values())
         y_test = encoder.transform(test_label)
 
