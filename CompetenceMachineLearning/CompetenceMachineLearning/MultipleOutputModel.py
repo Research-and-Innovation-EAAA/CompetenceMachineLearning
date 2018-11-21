@@ -11,6 +11,7 @@ import random
 
 
 
+
 from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import confusion_matrix
@@ -28,6 +29,10 @@ class MultipleOutputModel:
         db = DBhandler.DBHandler()
         training, test = db.loadAnnounceFromTestCats()
         train_data, train_label, test_data, test_label  = [], [], [], []
+        y_train, y_test =[], []
+        num_classes_array = []
+
+
 
         for x in training:
             #convert = x.numberFormat_body.split(' ')
@@ -52,14 +57,22 @@ class MultipleOutputModel:
         #print(train_label)
 
         # Use sklearn utility to convert label strings to numbered index
-        #encoder = LabelEncoder()
+        ##encoder = LabelEncoder()
+        ##for x in train_label:
+        ##    encoder.fit(x)
+        ##    y_train.append(encoder.transform(x))
+        ##for x in test_label:
+        ##    y_test.append(encoder.transform(x))
+        ##    #y_train = encoder.transform(train_label)
+        ##    #y_test = encoder.transform(test_label)
+
+
         #encoder.fit(train_label)
-        #y_train = encoder.transform(train_label)
-        #y_test = encoder.transform(test_label)
+
 
         df = pd.DataFrame(train_label)
         encoder = LabelEncoder()
-        encoder.fit(df.columns)
+        encoder.fit(list(df))
         y_train = encoder.transform(df.columns.get_values())
         y_test = encoder.transform(test_label)
 
@@ -68,10 +81,14 @@ class MultipleOutputModel:
         #y_train = v.transform(train_label)
         #y_test = v.transform(test_label)
 
-        print('Number of classes: ', y_train)
+        #print('Number of classes: ', y_train)
 
 
         # Converts the labels to a one-hot representation
+        #num_classes_array = set(list(itertools.chain.from_iterable(y_train)))
+
+        #num_classes_array = list(itertools.chain.from_iterable(y_train))
+        #print(len(num_classes_array))
         num_classes = np.max(y_train) + 1
         y_train = keras.utils.to_categorical(y_train, num_classes)
         y_test = keras.utils.to_categorical(y_test, num_classes)

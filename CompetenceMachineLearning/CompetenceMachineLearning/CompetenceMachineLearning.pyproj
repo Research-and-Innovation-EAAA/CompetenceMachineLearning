@@ -38,6 +38,7 @@
     <Compile Include="NumberFormatModel.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MultiColumnLabelEncoder.py" />
     <Compile Include="MultipleAdverts.py">
       <SubType>Code</SubType>
     </Compile>
