@@ -32,7 +32,10 @@
     </Compile>
     <Compile Include="main.py" />
     <Compile Include="DBhandler.py" />
-    <Compile Include="model.py">
+    <Compile Include="SingleCompetenceModel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NumberFormatModel.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MultipleAdverts.py">

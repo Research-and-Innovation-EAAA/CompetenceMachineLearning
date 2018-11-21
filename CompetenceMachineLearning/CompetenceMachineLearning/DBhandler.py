@@ -30,6 +30,9 @@ class DBHandler:
         else:
             return cnx
     
+    
+
+
     def loadCompetences(self):
         cnx = self.createConnection()
         cursor = cnx.cursor()
@@ -43,7 +46,7 @@ class DBHandler:
         return competenceList
 
 
-    def loadAdvertData(self, competenceID):
+    def loadAdvertDataNumberFormat(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID)
@@ -114,7 +117,7 @@ class DBHandler:
         return trainingAdverts, testingAdverts
 
 
-    def storeMatches(self, competenceID, advertIDs):
+    def storeMatches(self, competenceID, advertIDs, modelName):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         # There is a limit on the values clause, only 1000 rows can be inserted at a time. Making a loop to generate multiple queries as needed.
@@ -146,7 +149,7 @@ class DBHandler:
         return cursor.fetchone()[0]
 
 
-    def saveKerasModel(self, modelName, model, competenceID):
+    def saveModel(self, modelName, modelType, model, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         modelJSON = str(model.to_json())
@@ -156,16 +159,16 @@ class DBHandler:
             listJson.append(x.tolist())
         weightsJSON = json.dumps(listJson)
 
-        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
+        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "' and type = '" + modelType + "'")
         if (len(list(cursor)) == 0):
-            cursor.execute("insert into machine_model(kompetence_id, model, weights, name) values(" + str(competenceID) + ", '" + modelJSON + "', '" + weightsJSON + "', '" + modelName + "')")
+            cursor.execute("insert into machine_model(kompetence_id, model, weights, name, type) values(" + str(competenceID) + ", '" + modelJSON + "', '" + weightsJSON + "', '" + modelName + "', '" + modelType + "')")
         else:
-            cursor.execute("update machine_model set model = '" + modelJSON + "', weights = '" + weightsJSON + "' where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "'")
+            cursor.execute("update machine_model set model = '" + modelJSON + "', weights = '" + weightsJSON + "' where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "' and type = '" + modelType + "'")
         cnx.commit()
         cursor.close()
         cnx.close()
         
-    def loadCompetencesWithKerasModels(self):
+    def loadCompetencesWithModels(self):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         cursor.execute("select k._id, k.prefferredLabel from kompetence k, machine_model mm where k._id = mm.kompetence_id group_by k._id")
@@ -174,7 +177,7 @@ class DBHandler:
             competences.append(Competence(row[0], row[1]))
         return competences
         
-    def loadKerasModelNames(self, competenceID):
+    def loadModelNames(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID))
@@ -183,10 +186,10 @@ class DBHandler:
             modelNames.append(row[0])
         return modelNames
 
-    def loadKerasModel(self, competenceID, name):
+    def loadModel(self, competenceID, name, type):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID))
+        cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID) + "' and type = " + type)
         row = cursor.fetchone()
         modelJSON = row[0]
         weightsJSON = row[1]

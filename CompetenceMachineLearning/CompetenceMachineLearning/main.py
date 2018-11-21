@@ -1,7 +1,7 @@
 import DBhandler
 from Competence import Competence
-import model
-import ASCIIModel
+import NumberFormatModel
+from ASCIIModel import ASCIIModel
 import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
@@ -46,16 +46,16 @@ if __name__ == '__main__':
     # 12561 - Dansk
     # 12562 - Engelsk
 
-    mod = ASCIIModel.ASCIIModel()
+    mod = ASCIIModel("test")
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
-    mod1 = mod.createModel()
-    mod.trainModel(mod1, 12561, 1, 10)
+    mod.createModel()
+    mod.trainModel(12561, 1, 10)
 
-    mod = MultipleOutputModel.MultipleOutputModel()
-    mod.trainModel()
+    #mod = MultipleOutputModel.MultipleOutputModel()
+    #mod.trainModel()
 
     #model = db.loadKerasModel(13712, "Festabe")
     #runLoadedModel(model)

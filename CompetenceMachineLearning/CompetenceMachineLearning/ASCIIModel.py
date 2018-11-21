@@ -5,19 +5,16 @@ import random
 import DBhandler
 from Competence import Competence
 import matplotlib.pyplot as plt
+from SingleCompetenceModel import SingleCompetenceModel
 
 
-class ASCIIModel:
+class ASCIIModel(SingleCompetenceModel):
 
-    layerArray = []
+    
+    def __init__(self, name, competenceID):
+        MMLModelContainer.__init__(name, competenceID)
+        self.modelType = "ASCII"
 
-    def addStandardLayer(self, units):
-        layer = keras.layers.Dense(units, activation=tf.nn.relu)
-        self.layerArray.append(layer)
-
-    def addDropoutLayer(self, percentage):
-        layer = keras.layers.Dropout(percentage)
-        self.layerArray.append(layer)
 
     def createModel(self):
         model = keras.Sequential()
@@ -28,11 +25,10 @@ class ASCIIModel:
                 model.add(x)
         model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
         model.summary()
-        return model
+        self.model = model
 
-    def trainModel(self, model, kompetenceId, verboseMod, epoch ):
-        db = DBhandler.DBHandler()
-        training, test = db.loadAdvertDataASCII(kompetenceId)
+    def trainModel(self, kompetenceId, verboseMod, epoch ):
+        training, test = self.db.loadAdvertDataASCII(kompetenceId)
 
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
@@ -54,7 +50,7 @@ class ASCIIModel:
                                                             maxlen=2500)
 
 
-        model.compile(optimizer=tf.train.AdamOptimizer(),
+        self.model.compile(optimizer=tf.train.AdamOptimizer(),
                   loss='binary_crossentropy',
                   metrics=['accuracy'])
 
@@ -68,22 +64,14 @@ class ASCIIModel:
         y_val = train_label[:train_label_1]
         partial_y_train = train_label[train_label_1:]
 
-        history = model.fit(partial_x_train, 
+        history = self.model.fit(partial_x_train, 
                             partial_y_train, 
                             epochs = epoch, 
                             verbose= verboseMod, 
                             validation_data=(x_val, y_val))
 
-        results = model.evaluate(test_data, test_label)
+        results = self.model.evaluate(test_data, test_label)
         print(results)
-
-        if False:
-            numArray = model.get_weights()
-            listJson = [[]]
-            for x in numArray:
-                listJson.append(x.tolist())
-            weightsJSON = json.dumps(listJson)
-            raise Exception("You wanted this.")
 
         history_dict = history.history
         history_dict.keys()
@@ -118,5 +106,4 @@ class ASCIIModel:
         plt.legend()
 
         plt.show()
-
 

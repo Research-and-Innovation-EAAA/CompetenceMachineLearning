@@ -3,16 +3,14 @@ from tensorflow import keras
 import numpy as np
 import random
 import DBhandler
-#from DBhandler import DBHandler as db
 from Competence import Competence
+from SingleCompetenceModel import SingleCompetenceModel
 
-class Model:
+class NumberFormatModel(SingleCompetenceModel):
 
-    layerArray = []
-
-    def addStandardLayer(self, units):
-        layer = keras.layers.Dense(units, activation=tf.nn.relu)
-        self.layerArray.append(layer)
+    def __init__(self, name, competenceID):
+        MMLModelContainer.__init__(name, competenceID)
+        self.modelType = "NumberFormatted"
 
     def createModel(self):
         db = DBhandler.DBHandler()
@@ -28,15 +26,9 @@ class Model:
         model.summary()
         return model
 
-    
-    def testModel(self, model, test_data, test_label):
-        results = model.evaluate(test_data, test_label)
-
-        print('Test accuracy:', results)
-
     def trainModel(self, model, kompetenceId, verboseMod, epoch ):
         db = DBhandler.DBHandler()
-        training, test = db.loadAdvertData(kompetenceId)
+        training, test = db.loadAdvertDataNumberFormat(kompetenceId)
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
             convert = x.numberFormat_body.split(' ')
@@ -75,7 +67,9 @@ class Model:
 
         history = model.fit(partial_x_train, partial_y_train, epochs = int(epoch), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
-        self.testModel(model, test_data, test_label)
+        results = model.evaluate(test_data, test_label)
+
+        print('Test accuracy:', results)
 
         #db.saveModel("BananFlue1337", model, 12562)
 
