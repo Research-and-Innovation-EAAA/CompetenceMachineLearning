@@ -27,7 +27,7 @@ class ASCIIModel(SingleCompetenceModel):
         self.model = model
 
     def trainModel(self, verboseMod, epoch ):
-        training, test = self.db.loadAdvertDataSearchableBody(self.competenceID)
+        training, test = self.db.loadAdvertDataASCII(self.competenceID)
 
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
@@ -66,7 +66,7 @@ class ASCIIModel(SingleCompetenceModel):
         history = self.model.fit(partial_x_train, 
                             partial_y_train, 
                             epochs = epoch, 
-                            verbose= verboseMod, 
+                            verbose= verboseMod,
                             validation_data=(x_val, y_val))
 
         results = self.model.evaluate(test_data, test_label)

@@ -73,29 +73,35 @@ class DBHandler:
             else:
                 testingAdverts.append(Advert(row[0], row[1], 0))
             i += 1
-        #random.shuffle(trainingAdverts)
-        #random.shuffle(testingAdverts)
+        random.shuffle(trainingAdverts)
+        random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
-    def loadAdvertDataSearchableBody(self, competenceID):
+    def loadAdvertDataASCII(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
+        print("Progress Update 1")
         query = "select a._id, a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.searchable_body is not null"
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
         correctAdverts = list(cursor)
+        print("Progress Update 2")
         i = 0
         for row in correctAdverts:
             chars = list(row[1])
             numbers = []
             for char in chars:
-                numbers.append(str(ord(str(char))))
+                asciiValue = ord(str(char))
+                if asciiValue < 256:
+                    #Oddly, a few values were found around 82xx. Looking here https://www.ascii.cl/htmlcodes.htm it seems there are some ascii codes above 255, however, none of these are relevant for this application.
+                    numbers.append(str(ord(str(char))))
             if i < len(correctAdverts)*(6/10):
                 trainingAdverts.append(Advert(row[0], numbers, 1))
             else:
                 testingAdverts.append(Advert(row[0], numbers, 1))
             i += 1
+        print("Progress Update 3")
         q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
@@ -106,33 +112,36 @@ class DBHandler:
             chars = list(row[1])
             numbers = []
             for char in chars:
-                numbers.append(str(ord(str(char))))
+                asciiValue = ord(str(char))
+                if asciiValue < 256:
+                    numbers.append(str(ord(str(char))))
             if i < len(incorrectAdverts)*(6/10):
                 trainingAdverts.append(Advert(row[0], numbers, 0))
             else:
                 testingAdverts.append(Advert(row[0], numbers, 0))
             i += 1
+        print("Progress Update 4")
         random.shuffle(trainingAdverts)
         random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
 
-    def storeMatches(self, competenceID, advertIDs, modelName):
+    def storeMatches(self, competenceID, advertIDs, modelName, modelType):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         # There is a limit on the values clause, only 1000 rows can be inserted at a time. Making a loop to generate multiple queries as needed.
         # No need to check if the kompetence-annonce match exists already, the unique index on the table should prevent duplicate rows from being added.
         i = 0
         while i < len(advertIDs):
-            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id) values "
+            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id, model_name, model_type) values "
             j = 0
             done = False
             while (j < 950) and (not done):
                 if i + j < len(advertIDs):
                     if j == 0:
-                        query += "(" + competenceID + ", " + advertIDs[i+j] + ")"
+                        query += "(" + competenceID + ", " + advertIDs[i+j] + ", '" + modelName + "', '" + model_type + "')"
                     else:
-                        query += ", (" + competenceID + ", " + advertIDs[i+j] + ")"
+                        query += ", (" + competenceID + ", " + advertIDs[i+j] + ", '" + modelName + "', '" + model_type + "')"
                 else:
                     done = True
                 j += 1
