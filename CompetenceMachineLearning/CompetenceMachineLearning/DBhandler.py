@@ -77,10 +77,10 @@ class DBHandler:
         #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
-    def loadAdvertDataASCII(self, competenceID):
+    def loadAdvertDataSearchableBody(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.numberFormat_body is not null"
+        query = "select a._id, a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.searchable_body is not null"
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
@@ -96,7 +96,7 @@ class DBHandler:
             else:
                 testingAdverts.append(Advert(row[0], numbers, 1))
             i += 1
-        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
+        q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
         cursor.close()

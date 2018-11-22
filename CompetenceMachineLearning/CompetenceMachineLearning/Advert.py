@@ -1,14 +1,14 @@
 class Advert(object):
     _id = 0
-    numberFormat_body = ""
+    body = ""
     matchCurrentCompetence = 0
 
-    def __init__(self, _id, numberFormat_body, matchCurrentCompetence):
+    def __init__(self, _id, body, matchCurrentCompetence):
         self._id = _id;
-        self.numberFormat_body = numberFormat_body;
+        self.body = body;
         self.matchCurrentCompetence = matchCurrentCompetence
 
     def __str__(self):
-        return "Numberformat: " + self.numberFormat_body + ", ID: " + str(self._id) + ", Should match?: " + str(self.matchCurrentCompetence)
+        return "Body: " + self.body + ", ID: " + str(self._id) + ", Should match?: " + str(self.matchCurrentCompetence)
 
 
