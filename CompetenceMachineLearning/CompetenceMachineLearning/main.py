@@ -10,11 +10,20 @@ import json
 import matplotlib.pyplot as plt
 
 def testLoadedModel(mod):
-    test = None
+    test_data, test_label  = [], []
     if mod.modelType == "ASCII":
-        raise Exception("Error: Not implemented, Sync & use the new method name")
+        training, test = db.loadAdvertDataASCII(mod.competenceID)
+        for x in test:
+            test_data.append(x.body)
+            test_label.append(x.matchCurrentCompetence)
+        test_data = keras.preprocessing.sequence.pad_sequences(test_data, value=32, padding='post', maxlen=2500)
     elif mod.modelType == "NumberFormatted":
         training, test = db.loadAdvertDataNumberFormat(mod.competenceID)
+        for x in test:
+            convert = x.numberFormat_body.split(' ')
+            test_data.append(convert)
+            test_label.append(x.matchCurrentCompetence)
+        test_data = keras.preprocessing.sequence.pad_sequences(test_data, value=0, padding='post', maxlen=1000)
     elif mod.modelType == "Tokenized":
         raise Exception("Error: Not implemented")
     elif mod.modelType == "Multi":
@@ -22,18 +31,7 @@ def testLoadedModel(mod):
     else:
         raise Exception("Error: Unknown Model Type.")
     
-    test_data, test_label  = [], []
-    for x in test:
-        convert = x.numberFormat_body.split(' ')
-        test_data.append(convert)
-        test_label.append(x.matchCurrentCompetence)
-    test_data = keras.preprocessing.sequence.pad_sequences(test_data,
-                                                            value=0,
-                                                            padding='post',
-                                                            maxlen=1000)
-    
     results = mod.model.evaluate(test_data, test_label)
-    
     print('Test accuracy:', results)
 
 if __name__ == '__main__':
