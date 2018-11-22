@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # 12562 - Engelsk
     # 13737 - C#
 
-    mod = TokenizerModel("Testname", 12562)
+    mod = TokenizerModel("Testname", 13712)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)
