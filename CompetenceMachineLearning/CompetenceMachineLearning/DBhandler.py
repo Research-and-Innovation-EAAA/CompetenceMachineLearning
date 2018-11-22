@@ -189,7 +189,7 @@ class DBHandler:
     def loadModel(self, competenceID, name, type):
         cnx = self.createConnection()
         cursor = cnx.cursor()
-        cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID) + "' and type = " + type)
+        cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID) + " and type = '" + type + "'")
         row = cursor.fetchone()
         modelJSON = row[0]
         weightsJSON = row[1]

@@ -26,14 +26,14 @@ class SingleCompetenceModel(object):
     #TODO: See how much of trainModel is shared and put it into this superclass somehow.
 
     def saveModel(self):
-        db.saveModel(name, modelType, model, competenceID)
+        self.db.saveModel(self.name, self.modelType, self.model, self.competenceID)
         
     @staticmethod
     def loadModel(competenceID, name, type):
         db = DBhandler.DBHandler()
         from ASCIIModel import ASCIIModel
         from NumberFormatModel import NumberFormatModel
-        model = db.loadModel(competenceID, name)
+        model = db.loadModel(competenceID, name, type)
         mod = None
         if type == "ASCII":
             mod = ASCIIModel(name, competenceID)
@@ -46,8 +46,10 @@ class SingleCompetenceModel(object):
         else:
             raise Exception("Error: Unknown Model Type.")
 
+        model.compile(optimizer=tf.train.AdamOptimizer(), 
+                    loss='binary_crossentropy',
+                    metrics=['accuracy'])
         mod.model = model
-
         return mod
 
 

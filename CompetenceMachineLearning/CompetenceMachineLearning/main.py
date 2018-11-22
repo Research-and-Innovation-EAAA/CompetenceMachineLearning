@@ -7,34 +7,32 @@ import tensorflow as tf
 from tensorflow import keras
 import json
 import matplotlib.pyplot as plt
+from SingleCompetenceModel import SingleCompetenceModel
 
-def runLoadedModel(model):
-    #training, test = db.loadAdvertData(Competence(12562, "engelsk"))
-    training, test = db.loadAdvertData(Competence(13712, "Java (Computerprogrammering)"))
-    train_data, train_label, test_data, test_label  = [], [], [], []
-    for x in training:
-        convert = x.numberFormat_body.split(' ')
-        train_data.append(convert)
-        train_label.append(x.matchCurrentCompetence)
+def testLoadedModel(mod):
+    test = None
+    if mod.modelType == "ASCII":
+        raise Exception("Error: Not implemented, Sync & use the new method name")
+    elif mod.modelType == "NumberFormatted":
+        training, test = db.loadAdvertDataNumberFormat(mod.competenceID)
+    elif mod.modelType == "Tokenized":
+        raise Exception("Error: Not implemented")
+    elif mod.modelType == "Multi":
+        raise Exception("Error: Not implemented")
+    else:
+        raise Exception("Error: Unknown Model Type.")
+    
+    test_data, test_label  = [], []
     for x in test:
         convert = x.numberFormat_body.split(' ')
         test_data.append(convert)
         test_label.append(x.matchCurrentCompetence)
-    
-    train_data = keras.preprocessing.sequence.pad_sequences(train_data,
-                                                            value=0,
-                                                            padding='post',
-                                                            maxlen=1000)
     test_data = keras.preprocessing.sequence.pad_sequences(test_data,
                                                             value=0,
                                                             padding='post',
                                                             maxlen=1000)
- 
-    model.compile(optimizer=tf.train.AdamOptimizer(), 
-                    loss='binary_crossentropy',
-                    metrics=['accuracy'])
     
-    results = model.evaluate(test_data, test_label)
+    results = mod.model.evaluate(test_data, test_label)
     
     print('Test accuracy:', results)
 
@@ -47,19 +45,20 @@ if __name__ == '__main__':
     # 12562 - Engelsk
     # 13737 - C#
 
-    mod = NumberFormatModel("Testname", 13712)
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
-    mod.createModel()
-    mod.trainModel(1, 15)
+    #mod = NumberFormatModel("Testname", 13712)
+    #mod.addStandardLayer(32)
+    #mod.addDropoutLayer(0.1)
+    #mod.addStandardLayer(32)
+    #mod.addDropoutLayer(0.1)
+    #mod.createModel()
+    #mod.trainModel(1, 15)
+    #mod.saveModel()
 
     #mod = MultipleOutputModel.MultipleOutputModel()
     #mod.trainModel()
 
-    #model = db.loadKerasModel(13712, "Festabe")
-    #runLoadedModel(model)
+    mod = SingleCompetenceModel.loadModel(13712, "Testname", "NumberFormatted")
+    testLoadedModel(mod)
     
 
 
