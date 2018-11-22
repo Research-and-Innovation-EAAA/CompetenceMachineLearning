@@ -43,9 +43,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MultipleOutputModel.py" />
-    <Compile Include="TokenizerAdvert.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TokenizerModel.py">
       <SubType>Code</SubType>
     </Compile>
