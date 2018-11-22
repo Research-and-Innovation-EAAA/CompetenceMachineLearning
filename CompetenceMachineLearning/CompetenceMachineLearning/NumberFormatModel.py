@@ -17,7 +17,8 @@ class NumberFormatModel(SingleCompetenceModel):
         db = DBhandler.DBHandler()
         vocab_size = db.loadDictionaryLength()
         model = keras.Sequential()
-        model.add(keras.layers.Embedding(vocab_size, 3, input_length=1000))
+        # Vocab size is increase to prevent a bug where an advert uses the highest id, for some reason this crashed the fitting.
+        model.add(keras.layers.Embedding(vocab_size + 100, 3, input_length=1000))
         model.add(keras.layers.GlobalAveragePooling1D())
         if len(self.layerArray) != 0:
             for x in self.layerArray:
@@ -56,7 +57,7 @@ class NumberFormatModel(SingleCompetenceModel):
 
         train_data_1 = int((len(train_data)*(1/10)))
         train_label_1 = int((len(train_label)*(1/10)))
-      
+        
 
         x_val = train_data[:train_data_1]
         partial_x_train = train_data[train_data_1:]
@@ -64,7 +65,6 @@ class NumberFormatModel(SingleCompetenceModel):
         y_val = train_label[:train_label_1]
         partial_y_train = train_label[train_label_1:]
 
-        #TODO: Figure out why it suddenly stops at a seemingly random point.
         history = self.model.fit(partial_x_train, partial_y_train, epochs = int(epochs), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
         results = self.model.evaluate(test_data, test_label)

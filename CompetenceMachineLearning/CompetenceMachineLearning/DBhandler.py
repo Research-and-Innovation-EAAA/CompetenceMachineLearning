@@ -73,8 +73,8 @@ class DBHandler:
             else:
                 testingAdverts.append(Advert(row[0], row[1], 0))
             i += 1
-        random.shuffle(trainingAdverts)
-        random.shuffle(testingAdverts)
+        #random.shuffle(trainingAdverts)
+        #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
     def loadAdvertDataASCII(self, competenceID):
