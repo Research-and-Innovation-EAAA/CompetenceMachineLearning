@@ -30,9 +30,12 @@ class SingleCompetenceModel(object):
         
     @staticmethod
     def loadModel(competenceID, name, type):
+        if type == "Multi":
+            raise Exception("Error: Wrong class, do not load a multipleOutputModel in SingleCompetenceModel.")
         db = DBhandler.DBHandler()
         from ASCIIModel import ASCIIModel
         from NumberFormatModel import NumberFormatModel
+        from TokenizerModel import TokenizerModel
         model = db.loadModel(competenceID, name, type)
         mod = None
         if type == "ASCII":
@@ -40,9 +43,7 @@ class SingleCompetenceModel(object):
         elif type == "NumberFormatted":
             mod = NumberFormatModel(name, competenceID)
         elif type == "Tokenized":
-            raise Exception("ERROR: WIP, FINISH THE CODE YA DINGUS")
-        elif type == "Multi":
-            raise Exception("Error: Wrong class, do not load a multipleOutputModel in SingleCompetenceModel.")
+            mod = TokenizerModel(name, competenceID)
         else:
             raise Exception("Error: Unknown Model Type.")
 

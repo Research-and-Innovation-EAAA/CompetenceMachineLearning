@@ -26,7 +26,12 @@ def testLoadedModel(mod):
             test_label.append(x.matchCurrentCompetence)
         test_data = keras.preprocessing.sequence.pad_sequences(test_data, value=0, padding='post', maxlen=1000)
     elif mod.modelType == "Tokenized":
-        raise Exception("Error: Not implemented")
+        training, test = self.db.loadAdvertDataTokenizer(self.competenceID)
+        for x in test:
+            test_data.append(x.body)
+            test_label.append(x.matchCurrentCompetence)
+        tokenize = keras.preprocessing.text.Tokenizer(1000, char_level=False)
+        x_test = tokenize.texts_to_matrix(test_data)
     elif mod.modelType == "Multi":
         raise Exception("Error: Not implemented")
     else:
