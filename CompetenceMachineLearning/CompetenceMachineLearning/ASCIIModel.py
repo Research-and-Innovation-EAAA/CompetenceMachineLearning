@@ -27,14 +27,14 @@ class ASCIIModel(SingleCompetenceModel):
         self.model = model
 
     def trainModel(self, verboseMod, epoch ):
-        training, test = self.db.loadAdvertDataASCII(self.competenceID)
+        training, test = self.db.loadAdvertDataSearchableBody(self.competenceID)
 
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
-            train_data.append(x.numberFormat_body)
+            train_data.append(x.body)
             train_label.append(x.matchCurrentCompetence)
         for x in test:
-            test_data.append(x.numberFormat_body)
+            test_data.append(x.body)
             test_label.append(x.matchCurrentCompetence)
         
 

@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # 12562 - Engelsk
     # 13737 - C#
 
-    mod = NumberFormatModel("Testname", 13712)
+    mod = ASCIIModel("Testname", 13712)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)
