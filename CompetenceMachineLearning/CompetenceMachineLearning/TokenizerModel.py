@@ -3,6 +3,8 @@ from tensorflow import keras
 import numpy as np
 import random
 import DBhandler
+import os
+
 from Competence import Competence
 from SingleCompetenceModel import SingleCompetenceModel
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder
@@ -15,13 +17,8 @@ class TokenizerModel(SingleCompetenceModel):
         db = DBhandler.DBHandler()
 
     def createModel(self):
-        db = DBhandler.DBHandler()
-        vocab_size = db.loadDictionaryLength()
         model = keras.Sequential()
-        # Vocab size is increase to prevent a bug where an advert uses the highest id, for some reason this crashed the fitting.
-        #model.add(keras.layers.Embedding(vocab_size + 100, 3, input_length=1000))
-        #model.add(keras.layers.GlobalAveragePooling1D())
-        model.add(keras.layers.Dense(20, input_shape=(1000,), activation=tf.nn.relu))
+        model.add(keras.layers.Dense(32, input_shape=(1000,), activation=tf.nn.relu))
         if len(self.layerArray) != 0:
             for x in self.layerArray:
                 model.add(x)
@@ -35,13 +32,9 @@ class TokenizerModel(SingleCompetenceModel):
 
 
         for x in training:
-            #convert = x.body.split(' ')
-            #train_data.append(convert)
             train_data.append(x.body)
             train_label.append(x.matchCurrentCompetence)
         for x in test:
-            #convert = x.body.split(' ')
-            #test_data.append(convert)
             test_data.append(x.body)
             test_label.append(x.matchCurrentCompetence)
             
@@ -51,50 +44,34 @@ class TokenizerModel(SingleCompetenceModel):
 
         x_train = tokenize.texts_to_matrix(train_data)
         x_test = tokenize.texts_to_matrix(test_data)
-
-        #encoder = LabelEncoder()
-        #encoder.fit(train_label)
-        #y_train = encoder.transform(train_label)
-        #y_test = encoder.transform(test_label)
         
-        #num_classes = np.max(y_train) + 1
-
-        #y_train = keras.utils.to_categorical(y_train, num_classes)
-        #y_test = keras.utils.to_categorical(y_test, num_classes)
-
         print(len(train_data))
-
-        #train_data = keras.preprocessing.sequence.pad_sequences(train_data,
-        #                                                        value=0,
-        #                                                        padding='post',
-        #                                                        maxlen=1000)
-
-        #test_data = keras.preprocessing.sequence.pad_sequences(test_data,
-        #                                                        value=0,
-        #                                                        padding='post',
-        #                                                        maxlen=1000)
-
         self.model.compile(optimizer=tf.train.AdamOptimizer(), 
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
 
-        #train_data_1 = int((len(train_data)*(1/10)))
-        #train_label_1 = int((len(train_label)*(1/10)))
+        train_data_1 = int((len(x_train)*(1/10)))
+        train_label_1 = int((len(train_label)*(1/10)))
         
 
-        #x_val = train_data[:train_data_1]
-        #partial_x_train = train_data[train_data_1:]
+        x_val = x_train[:train_data_1]
+        partial_x_train = x_train[train_data_1:]
 
-        #y_val = train_label[:train_label_1]
-        #partial_y_train = train_label[train_label_1:]
+        y_val = train_label[:train_label_1]
+        partial_y_train = train_label[train_label_1:]
 
-        history = self.model.fit(x_train, train_label, epochs = int(epochs), verbose=int(verboseMod), validation_split=0.1)
+        checkpoint_path = "training_1/cp.ckpt"
+        checkpoint_dir = os.path.dirname(checkpoint_path)
+
+        # Create checkpoint callback
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
+                                                 save_weights_only=True,
+                                                 verbose=1)
+        history = self.model.fit(partial_x_train, partial_y_train, epochs = int(epochs), verbose=int(verboseMod), validation_data=(x_val, y_val), callbacks = [cp_callback])
 
         results = self.model.evaluate(x_test, test_label)
 
         print('Test accuracy:', results)
-
-        #db.saveModel("BananFlue1337", self.model, 12562)
 
         history_dict = history.history
         history_dict.keys()

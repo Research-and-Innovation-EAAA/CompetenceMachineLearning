@@ -51,12 +51,10 @@ if __name__ == '__main__':
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
 
     mod = TokenizerModel("Testname", 13712)
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
+    mod.addStandardLayer(12)
+    mod.addDropoutLayer(0.3)
     mod.createModel()
-    mod.trainModel(1, 10)
+    mod.trainModel(1, 100)
     
     mod.saveModel()
 
