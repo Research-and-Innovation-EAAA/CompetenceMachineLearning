@@ -2,6 +2,7 @@ import DBhandler
 from Competence import Competence
 from NumberFormatModel import NumberFormatModel
 from ASCIIModel import ASCIIModel
+from TokenizerModel import TokenizerModel
 import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     # 12562 - Engelsk
     # 13737 - C#
 
-    mod = ASCIIModel("Testname", 13712)
+    mod = TokenizerModel("Testname", 12562)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)

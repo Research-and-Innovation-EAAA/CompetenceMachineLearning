@@ -77,6 +77,37 @@ class DBHandler:
         #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
+    def loadAdvertDataTokenizer(self, competenceID):
+        cnx = self.createConnection()
+        cursor = cnx.cursor()
+        query = "select a._id, a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.searchable_body is not NULL"
+        cursor.execute(query)
+        trainingAdverts = []
+        testingAdverts = []
+        correctAdverts = list(cursor)
+        i = 0
+        for row in correctAdverts:
+            if i < len(correctAdverts)*(6/10):
+                trainingAdverts.append(Advert(row[0], row[1], 1))
+            else:
+                testingAdverts.append(Advert(row[0], row[1], 1))
+            i += 1
+        q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
+        cursor.execute(q2)
+        incorrectAdverts = list(cursor)
+        cursor.close()
+        cnx.close()
+        i = 0
+        for row in incorrectAdverts:
+            if i < len(incorrectAdverts)*(6/10):
+                trainingAdverts.append(Advert(row[0], row[1], 0))
+            else:
+                testingAdverts.append(Advert(row[0], row[1], 0))
+            i += 1
+        #random.shuffle(trainingAdverts)
+        #random.shuffle(testingAdverts)
+        return trainingAdverts, testingAdverts
+
     def loadAdvertDataSearchableBody(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
