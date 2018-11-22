@@ -60,25 +60,28 @@ class MultipleOutputModel:
         #print(train_label)
 
         # Use sklearn utility to convert label strings to numbered index
-        ##encoder = LabelEncoder()
-        ##for x in train_label:
-        ##    encoder.fit(x)
-        ##    y_train.append(encoder.transform(x))
-        ##for x in test_label:
-        ##    y_test.append(encoder.transform(x))
-        ##    #y_train = encoder.transform(train_label)
-        ##    #y_test = encoder.transform(test_label)
+        #encoder = LabelEncoder()
+        #for x in train_label:
+        #    encoder.fit(x)
+        #    y_train.append(encoder.transform(x))
+        #for x in test_label:
+        #    y_test.append(encoder.transform(x))
+        #    #y_train = encoder.transform(train_label)
+        #    #y_test = encoder.transform(test_label)
 
 
         #encoder.fit(train_label)
 
 
         df = pd.DataFrame(train_label)
+        #df.drop(index='NONE')
         encoder = LabelEncoder()
-        encoder.fit(list(df))
-        y_train = encoder.transform(list(df))
+        encoder.fit(df)
+        y_train = encoder.transform(df)
         y_test = encoder.transform(test_label)
-        print("Shape of y: " + str(df.shape[0]))
+        print("Shape of y: " + str(list(df.iloc[0])))
+        #print("Shape of y_train: " + str(set(y_train.iloc[500])))
+
 
         #v = DictVectorizer(sparse=False)
         #v.fit(train_label)
