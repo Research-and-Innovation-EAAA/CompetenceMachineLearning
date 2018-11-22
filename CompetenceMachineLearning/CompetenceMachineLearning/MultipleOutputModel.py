@@ -32,6 +32,9 @@ class MultipleOutputModel:
         y_train, y_test =[], []
         num_classes_array = []
 
+       
+
+
 
 
         for x in training:
@@ -73,8 +76,9 @@ class MultipleOutputModel:
         df = pd.DataFrame(train_label)
         encoder = LabelEncoder()
         encoder.fit(list(df))
-        y_train = encoder.transform(df.columns.get_values())
+        y_train = encoder.transform(list(df))
         y_test = encoder.transform(test_label)
+        print("Shape of y: " + str(df.shape[0]))
 
         #v = DictVectorizer(sparse=False)
         #v.fit(train_label)
@@ -98,6 +102,11 @@ class MultipleOutputModel:
         print('x_test shape:', x_test.shape)
         print('y_train shape:', y_train.shape)
         print('y_test shape:', y_test.shape)
+        print("Train data lenght: " + str(len(x_train)))
+        test=[]
+        for x in y_train:
+            test.extend(x)
+        print("Train label lenght: " + str(len(test)))
 
         model = keras.Sequential()
         model.add(keras.layers.Dense(3, input_shape=(max_words,), activation=tf.nn.relu))
