@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # 13737 - C#
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
 
-    mod = ASCIIModel("Testname", 13712)
+    mod = ASCIIModel("Testname", 12562)
     mod.addStandardLayer(256)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)

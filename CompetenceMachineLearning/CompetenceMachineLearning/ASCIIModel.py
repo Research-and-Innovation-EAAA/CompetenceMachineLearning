@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from SingleCompetenceModel import SingleCompetenceModel
 import tensorflow as tf
 from tensorflow import keras
+import os
 
 
 class ASCIIModel(SingleCompetenceModel):
