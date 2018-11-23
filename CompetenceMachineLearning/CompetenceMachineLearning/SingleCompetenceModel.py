@@ -20,6 +20,7 @@ class SingleCompetenceModel(object):
         self.layerArray.append(layer)
 
     def addDropoutLayer(self, percentage):
+        #Percentage input should be 0 to 1
         layer = keras.layers.Dropout(percentage)
         self.layerArray.append(layer)
 

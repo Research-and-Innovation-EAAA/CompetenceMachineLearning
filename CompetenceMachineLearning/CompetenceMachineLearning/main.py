@@ -50,15 +50,16 @@ if __name__ == '__main__':
     # 13737 - C#
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
 
-    mod = TokenizerModel("Testname", 13712)
-    mod.addStandardLayer(32)
+    mod = ASCIIModel("Testname", 13712)
+    mod.addStandardLayer(256)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(32)
     mod.addDropoutLayer(0.1)
     mod.createModel()
-    mod.trainModel(1, 10)
+    mod.trainModel(1, 20)
     
-    mod.saveModel()
+
+    #mod.saveModel()
 
     #mod = MultipleOutputModel.MultipleOutputModel()
     #mod.trainModel()

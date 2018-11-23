@@ -108,7 +108,7 @@ class DBHandler:
         #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
-    def loadAdvertDataSearchableBody(self, competenceID):
+    def loadAdvertDataASCII(self, competenceID):
         cnx = self.createConnection()
         cursor = cnx.cursor()
         print("Progress Update 1")
@@ -198,7 +198,6 @@ class DBHandler:
         for x in numArray:
             listJson.append(x.tolist())
         weightsJSON = json.dumps(listJson)
-
         cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "' and type = '" + modelType + "'")
         if (len(list(cursor)) == 0):
             cursor.execute("insert into machine_model(kompetence_id, model, weights, name, type) values(" + str(competenceID) + ", '" + modelJSON + "', '" + weightsJSON + "', '" + modelName + "', '" + modelType + "')")
