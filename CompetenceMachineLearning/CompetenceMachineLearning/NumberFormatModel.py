@@ -14,8 +14,7 @@ class NumberFormatModel(SingleCompetenceModel):
         db = DBhandler.DBHandler()
 
     def createModel(self):
-        db = DBhandler.DBHandler()
-        vocab_size = db.loadDictionaryLength()
+        vocab_size = self.db.loadDictionaryLength()
         model = keras.Sequential()
         # Vocab size is increased to prevent a bug where an advert uses the highest id, for some reason this crashed the fitting.
         model.add(keras.layers.Embedding(vocab_size + 100, 3, input_length=1000))
