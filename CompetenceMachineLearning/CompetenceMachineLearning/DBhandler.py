@@ -11,7 +11,6 @@ import tensorflow
 from tensorflow import keras
 import numpy
 
-
 class DBHandler:
 
     def __createConnection(self):
@@ -30,9 +29,6 @@ class DBHandler:
         else:
             return cnx
     
-    
-
-
     def loadAdvertDataNumberFormat(self, competenceID):
         cnx = self.__createConnection()
         cursor = cnx.cursor()
@@ -182,22 +178,22 @@ class DBHandler:
         cnx.close()
         return trainingAdverts, testingAdverts
 
-    def storeMatches(self, competenceID, advertIDs, modelName, modelType):
+    def storeMatches(self, competenceID, advertIDs, modelID):
         cnx = self.__createConnection()
         cursor = cnx.cursor()
         # There is a limit on the values clause, only 1000 rows can be inserted at a time. Making a loop to generate multiple queries as needed.
         # No need to check if the kompetence-annonce match exists already, the unique index on the table should prevent duplicate rows from being added.
         i = 0
         while i < len(advertIDs):
-            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id, model_name, model_type) values "
+            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id, model_id) values "
             j = 0
             done = False
             while (j < 950) and (not done):
                 if i + j < len(advertIDs):
                     if j == 0:
-                        query += "(" + competenceID + ", " + advertIDs[i+j] + ", '" + modelName + "', '" + model_type + "')"
+                        query += "(" + competenceID + ", " + advertIDs[i+j] + ", " + modelID + ")"
                     else:
-                        query += ", (" + competenceID + ", " + advertIDs[i+j] + ", '" + modelName + "', '" + model_type + "')"
+                        query += ", (" + competenceID + ", " + advertIDs[i+j] + ", " + modelID + ")"
                 else:
                     done = True
                 j += 1
