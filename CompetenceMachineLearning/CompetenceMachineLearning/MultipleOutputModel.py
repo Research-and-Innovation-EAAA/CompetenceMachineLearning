@@ -27,7 +27,7 @@ from tensorflow import keras
 class MultipleOutputModel:
     def trainModel(self):
         db = DBhandler.DBHandler()
-        training, test = db.loadAnnounceFromTestCats()
+        training, test = db.loadAdvertDataMulti()
         train_data, train_label, test_data, test_label  = [], [], [], []
         y_train, y_test =[], []
         num_classes_array = []
