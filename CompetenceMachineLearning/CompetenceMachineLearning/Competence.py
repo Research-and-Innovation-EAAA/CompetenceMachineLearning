@@ -1,12 +1,12 @@
 class Competence(object):
     _id = 0
-    prefferredLabel = ""
+    preferredLabel = ""
 
-    def __init__(self, _id, prefferredLabel):
+    def __init__(self, _id, preferredLabel):
         self._id = _id;
-        self.prefferredLabel = prefferredLabel;
+        self.preferredLabel = preferredLabel;
 
     def __str__(self):
-        return "Name: " + self.prefferredLabel + ", ID: " + str(self._id)
+        return "Name: " + self.preferredLabel + ", ID: " + str(self._id)
 
 

@@ -27,7 +27,8 @@ class SingleCompetenceModel(object):
     #TODO: See how much of trainModel is shared and put it into this superclass somehow.
 
     def saveModel(self):
-        self.db.saveModel(self.name, self.modelType, self.model, self.competenceID)
+        if modelType != None:
+            self.db.saveModel(self.name, self.modelType, self.model, self.competenceID)
         
     @staticmethod
     def loadModel(competenceID, name, type):
