@@ -17,11 +17,26 @@ class TokenizerModel(SingleCompetenceModel):
         db = DBhandler.DBHandler()
 
     def createModel(self):
+        #model = keras.Sequential()
+        #model.add(keras.layers.Dense(32, input_shape=(1000,), activation=tf.nn.relu))
+        #if len(self.layerArray) != 0:
+        #    for x in self.layerArray:
+        #        model.add(x)
+        #model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
+        #model.summary()
+        #self.model = model
+
         model = keras.Sequential()
-        model.add(keras.layers.Dense(32, input_shape=(1000,), activation=tf.nn.relu))
-        if len(self.layerArray) != 0:
-            for x in self.layerArray:
-                model.add(x)
+        model.add(keras.layers.Embedding(20000, 4, input_length=1000))
+        model.add(keras.layers.Dropout(0.3))
+        model.add(keras.layers.Conv1D(8, 5, activation=tf.nn.relu))
+        model.add(keras.layers.MaxPooling1D(pool_size=4))
+        #model.add(keras.layers.GlobalAveragePooling1D())
+        model.add(keras.layers.LSTM(4))
+        #if len(self.layerArray) != 0:
+        #    for x in self.layerArray:
+        #        model.add(x)
+
         model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
         model.summary()
         self.model = model
@@ -38,21 +53,39 @@ class TokenizerModel(SingleCompetenceModel):
             test_data.append(x.body)
             test_label.append(x.matchCurrentCompetence)
             
-        max_words = 1000
+        max_words = 20000
+        #tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
         tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
         tokenize.fit_on_texts(train_data) # only fit on train
 
-        x_train = tokenize.texts_to_matrix(train_data)
-        x_test = tokenize.texts_to_matrix(test_data)
+        #################################################################################
+        #test remove if doesn't work
+        x_sequences = tokenize.texts_to_sequences(train_data)
+        y_sequences = tokenize.texts_to_sequences(test_data)
+        x_train = keras.preprocessing.sequence.pad_sequences(x_sequences, maxlen=1000)
+        x_test = keras.preprocessing.sequence.pad_sequences(y_sequences, maxlen=1000)
+
+        ##################################################################################
+
+        #x_train = tokenize.texts_to_matrix(train_data)
+        #x_test = tokenize.texts_to_matrix(test_data)
         
         print(len(train_data))
         self.model.compile(optimizer=tf.train.AdamOptimizer(), 
                     loss='binary_crossentropy',
                     metrics=['accuracy'])
 
+        #train_data_1 = int((len(x_train)*(1/10)))
+        #train_label_1 = int((len(train_label)*(1/10)))
         train_data_1 = int((len(x_train)*(1/10)))
         train_label_1 = int((len(train_label)*(1/10)))
         
+
+        #x_val = x_train[:train_data_1]
+        #partial_x_train = x_train[train_data_1:]
+
+        #y_val = train_label[:train_label_1]
+        #partial_y_train = train_label[train_label_1:]
 
         x_val = x_train[:train_data_1]
         partial_x_train = x_train[train_data_1:]
@@ -70,6 +103,7 @@ class TokenizerModel(SingleCompetenceModel):
         history = self.model.fit(partial_x_train, partial_y_train, epochs = int(epochs), verbose=int(verboseMod), validation_data=(x_val, y_val), callbacks = [cp_callback])
 
         results = self.model.evaluate(x_test, test_label)
+        #results = self.model.evaluate(test_data, test_label)
 
         print('Test accuracy:', results)
 

@@ -18,7 +18,7 @@ class ASCIIModel(SingleCompetenceModel):
 
     def createModel(self):
         model = keras.Sequential()
-        model.add(keras.layers.Embedding(256, 10, input_length=2500))
+        model.add(keras.layers.Embedding(256, 3, input_length=2500))
         model.add(keras.layers.GlobalAveragePooling1D())
         if len(self.layerArray) != 0:
             for x in self.layerArray:
