@@ -30,11 +30,11 @@ class NumberFormatModel(SingleCompetenceModel):
         training, test = self.db.loadAdvertDataNumberFormat(self.competenceID)
         train_data, train_label, test_data, test_label  = [], [], [], []
         for x in training:
-            convert = x.numberFormat_body.split(' ')
+            convert = x.body.split(' ')
             train_data.append(convert)
             train_label.append(x.matchCurrentCompetence)
         for x in test:
-            convert = x.numberFormat_body.split(' ')
+            convert = x.body.split(' ')
             test_data.append(convert)
             test_label.append(x.matchCurrentCompetence)
         
