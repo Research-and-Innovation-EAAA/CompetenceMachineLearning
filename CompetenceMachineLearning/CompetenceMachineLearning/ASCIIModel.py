@@ -73,9 +73,6 @@ class ASCIIModel(SingleCompetenceModel):
         results = self.model.evaluate(test_data, test_label)
         print(results)
 
-        history_dict = history.history
-        history_dict.keys()
-
         acc = history.history['acc']
         val_acc = history.history['val_acc']
         loss = history.history['loss']
@@ -95,8 +92,6 @@ class ASCIIModel(SingleCompetenceModel):
         plt.show()
 
         plt.clf()   # clear figure
-        acc_values = history_dict['acc']
-        val_acc_values = history_dict['val_acc']
 
         plt.plot(epochs, acc, 'bo', label='Training acc')
         plt.plot(epochs, val_acc, 'b', label='Validation acc')
