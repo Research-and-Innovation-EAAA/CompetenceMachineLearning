@@ -27,12 +27,12 @@ class TokenizerModel(SingleCompetenceModel):
         #self.model = model
 
         model = keras.Sequential()
-        model.add(keras.layers.Embedding(20000, 4, input_length=1000))
-        model.add(keras.layers.Dropout(0.3))
-        model.add(keras.layers.Conv1D(8, 5, activation=tf.nn.relu))
+        model.add(keras.layers.Embedding(20000, 3, input_length=1000))
+        model.add(keras.layers.Dropout(0.5))
+        model.add(keras.layers.Conv1D(4, 3, kernel_regularizer=keras.regularizers.l1(0.01), activation=tf.nn.relu))
         model.add(keras.layers.MaxPooling1D(pool_size=4))
         #model.add(keras.layers.GlobalAveragePooling1D())
-        model.add(keras.layers.LSTM(4))
+        model.add(keras.layers.LSTM(3))
         #if len(self.layerArray) != 0:
         #    for x in self.layerArray:
         #        model.add(x)
