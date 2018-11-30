@@ -70,11 +70,6 @@ class NumberFormatModel(SingleCompetenceModel):
 
         print('Test accuracy:', results)
 
-        #db.saveModel("BananFlue1337", self.model, 12562)
-
-        history_dict = history.history
-        history_dict.keys()
-
         import matplotlib.pyplot as plt
         acc = history.history['acc']
         val_acc = history.history['val_acc']
@@ -94,8 +89,6 @@ class NumberFormatModel(SingleCompetenceModel):
         plt.show()
 
         plt.clf()   # clear figure
-        acc_values = history_dict['acc']
-        val_acc_values = history_dict['val_acc']
 
         plt.plot(epochs, acc, 'bo', label='Training acc')
         plt.plot(epochs, val_acc, 'b', label='Validation acc')

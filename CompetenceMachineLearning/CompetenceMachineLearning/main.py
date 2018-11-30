@@ -58,7 +58,7 @@ if __name__ == '__main__':
     #mod.addStandardLayer(32)
     #mod.addDropoutLayer(0.1)
     mod.createModel()
-    mod.trainModel(1, 10)
+    mod.trainModel(1, 5)
     
 
     #mod.saveModel()
