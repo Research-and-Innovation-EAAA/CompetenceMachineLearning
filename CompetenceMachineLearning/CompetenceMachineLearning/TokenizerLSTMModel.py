@@ -20,7 +20,7 @@ class TokenizerLSTMModel(SingleCompetenceModel):
         model = keras.Sequential()
         model.add(keras.layers.Embedding(20000, 5, input_length=1000))
         model.add(keras.layers.Dropout(0.3))
-        model.add(keras.layers.Conv1D(4, 5, kernel_regularizer=keras.regularizers.l1(0.01), activation=tf.nn.relu))
+        #model.add(keras.layers.Conv1D(4, 5, kernel_regularizer=keras.regularizers.l1(0.01), activation=tf.nn.relu))
         model.add(keras.layers.MaxPooling1D(pool_size=4))
         model.add(keras.layers.LSTM(5))
         model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))

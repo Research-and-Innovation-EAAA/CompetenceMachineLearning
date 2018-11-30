@@ -3,7 +3,7 @@ from Competence import Competence
 from SingleCompetenceModel import SingleCompetenceModel
 from NumberFormatModel import NumberFormatModel
 from ASCIIModel import ASCIIModel
-from TokenizerModel import TokenizerModel
+from TokenizerDenseModel import TokenizerDenseModel
 from TokenizerLSTMModel import TokenizerLSTMModel
 import MultipleOutputModel
 import tensorflow as tf
@@ -52,13 +52,13 @@ if __name__ == '__main__':
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
     # 13013 - værdier
 
-    mod = TokenizerLSTMModel("Testname", 12562)
+    mod = TokenizerDenseModel("Testname", 12562)
     #mod.addStandardLayer(3)
     mod.addDropoutLayer(0.4)
     #mod.addStandardLayer(32)
     #mod.addDropoutLayer(0.1)
     mod.createModel()
-    mod.trainModel(1, 5)
+    mod.trainModel(1, 10)
     
 
     #mod.saveModel()
