@@ -38,6 +38,7 @@ class SingleCompetenceModel(object):
         from ASCIIModel import ASCIIModel
         from NumberFormatModel import NumberFormatModel
         from TokenizerModel import TokenizerModel
+        from TokenizerLSTMModel import TokenizerLSTMModel
         model = db.loadModel(competenceID, name, type)
         mod = None
         if type == "ASCII":
@@ -46,6 +47,8 @@ class SingleCompetenceModel(object):
             mod = NumberFormatModel(name, competenceID)
         elif type == "Tokenized":
             mod = TokenizerModel(name, competenceID)
+        elif type == "TokenizedLSTM":
+            mod = TokenizerLSTMModel(name, competenceID)
         else:
             raise Exception("Error: Unknown Model Type.")
 
