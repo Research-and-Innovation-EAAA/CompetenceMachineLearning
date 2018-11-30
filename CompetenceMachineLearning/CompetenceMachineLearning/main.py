@@ -50,13 +50,13 @@ if __name__ == '__main__':
     # 13737 - C#
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
 
-    mod = NumberFormatModel("Testname", 13712)
+    mod = ASCIIModel("Testname", 13712)
+    mod.addStandardLayer(16)
+    mod.addDropoutLayer(0.1)
     mod.addStandardLayer(8)
-    mod.addDropoutLayer(0.2)
-    mod.addStandardLayer(4)
-    mod.addDropoutLayer(0.2)
+    mod.addDropoutLayer(0.1)
     mod.createModel()
-    mod.trainModel(1, 5)
+    mod.trainModel(1, 25)
     
 
     #mod.saveModel()
