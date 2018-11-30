@@ -46,7 +46,7 @@
     <Compile Include="TokenizerLSTMModel.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TokenizerModel.py">
+    <Compile Include="TokenizerDenseModel.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="__init__.py" />
