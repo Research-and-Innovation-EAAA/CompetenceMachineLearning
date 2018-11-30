@@ -44,12 +44,6 @@ class DBHandler:
         for row in correctAdverts:
             allCorrectData.append(Advert(row[0], row[1], 1))
             i += 1
-        #for row in correctAdverts:
-        #    if i < len(correctAdverts)*(6/10):
-        #        trainingAdverts.append(Advert(row[0], row[1], 1))
-        #    else:
-        #        testingAdverts.append(Advert(row[0], row[1], 1))
-        #    i += 1
         q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
@@ -60,13 +54,6 @@ class DBHandler:
             allIncorrectData.append(Advert(row[0], row[1], 0))
             i += 1
 
-        #for row in incorrectAdverts:
-        #    if i < len(incorrectAdverts)*(6/10):
-        #        trainingAdverts.append(Advert(row[0], row[1], 0))
-        #    else:
-        #        testingAdverts.append(Advert(row[0], row[1], 0))
-        #    i += 1
-
         random.shuffle(allCorrectData)
         random.shuffle(allIncorrectData)
 
@@ -76,8 +63,6 @@ class DBHandler:
         trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
         testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
 
-        #random.shuffle(trainingAdverts)
-        #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
     def loadAdvertDataTokenizer(self, competenceID):
@@ -120,7 +105,6 @@ class DBHandler:
     def loadAdvertDataASCII(self, competenceID):
         cnx = self.__createConnection()
         cursor = cnx.cursor()
-        print("Progress Update 1")
         query = "select a._id, a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.searchable_body is not null"
         cursor.execute(query)
         trainingAdverts = []
@@ -129,7 +113,6 @@ class DBHandler:
         allIncorrectData = []
 
         correctAdverts = list(cursor)
-        print("Progress Update 2")
         i = 0
 
         for row in correctAdverts:
@@ -143,20 +126,6 @@ class DBHandler:
             allCorrectData.append(Advert(row[0], numbers, 1))
             i += 1
 
-        #for row in correctAdverts:
-        #    chars = list(row[1])
-        #    numbers = []
-        #    for char in chars:
-        #        asciiValue = ord(str(char))
-        #        if asciiValue < 256:
-        #            #Oddly, a few values were found around 82xx. Looking here https://www.ascii.cl/htmlcodes.htm it seems there are some ascii codes above 255, however, none of these are relevant for this application.
-        #            numbers.append(str(ord(str(char))))
-        #    if i < len(correctAdverts)*(6/10):
-        #        trainingAdverts.append(Advert(row[0], numbers, 1))
-        #    else:
-        #        testingAdverts.append(Advert(row[0], numbers, 1))
-        #    i += 1
-        print("Progress Update 3")
         q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
@@ -174,20 +143,6 @@ class DBHandler:
             allIncorrectData.append(Advert(row[0], numbers, 0))
             i += 1
 
-        #for row in incorrectAdverts:
-        #    chars = list(row[1])
-        #    numbers = []
-        #    for char in chars:
-        #        asciiValue = ord(str(char))
-        #        if asciiValue < 256:
-        #            numbers.append(str(ord(str(char))))
-        #    if i < len(incorrectAdverts)*(6/10):
-        #        trainingAdverts.append(Advert(row[0], numbers, 0))
-        #    else:
-        #        testingAdverts.append(Advert(row[0], numbers, 0))
-        #    i += 1
-        print("Progress Update 4")
-
         random.shuffle(allCorrectData)
         random.shuffle(allIncorrectData)
 
@@ -197,8 +152,6 @@ class DBHandler:
         trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
         testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
 
-        #random.shuffle(trainingAdverts)
-        #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
     def loadAdvertDataMulti(self):
@@ -210,7 +163,6 @@ class DBHandler:
         query1 ="SELECT a._id, a.searchable_body FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =150388 or ak.kompetence_id = 165432 or ak.kompetence_id = 13727"
         cursor.execute(query1)
         searchableBodyCursor = list(cursor)
-        #correctAdverts = list(cursor)
         i = 0
         for row in searchableBodyCursor:
             queryCompetencelist ="SELECT k.prefferredLabel FROM annonce_kompetence ak JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.annonce_id = " + str(row[0])
@@ -221,19 +173,6 @@ class DBHandler:
             else:
                 testingAdverts.append(MultipleAdverts(row[1], competences))
 
-
-        #query2 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id !=12551 or ak.kompetence_id != 12562 or ak.kompetence_id != 13727 " + "limit " + str(len(correctAdverts))
-
-
-        #cursor.execute(query2)
-        #incorrectAdverts = list(cursor)
-        #i = 0
-        #for row in incorrectAdverts:
-        #    if i < len(incorrectAdverts)*(6/10):
-        #        trainingAdverts.append(MultipleAdverts(row[0], row[1]))
-        #    else:
-        #        testingAdverts.append(MultipleAdverts(row[0], row[1]))
-        #    i += 1
         random.shuffle(trainingAdverts)
         random.shuffle(testingAdverts)
         cursor.close()
