@@ -4,6 +4,7 @@ from SingleCompetenceModel import SingleCompetenceModel
 from NumberFormatModel import NumberFormatModel
 from ASCIIModel import ASCIIModel
 from TokenizerModel import TokenizerModel
+from TokenizerLSTMModel import TokenizerLSTMModel
 import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
@@ -49,12 +50,13 @@ if __name__ == '__main__':
     # 12562 - Engelsk
     # 13737 - C#
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
+    # 13013 - værdier
 
-    mod = TokenizerModel("Testname", 12562)
-    mod.addStandardLayer(20)
-    mod.addDropoutLayer(0.1)
-    mod.addStandardLayer(32)
-    mod.addDropoutLayer(0.1)
+    mod = TokenizerLSTMModel("Testname", 12562)
+    #mod.addStandardLayer(3)
+    mod.addDropoutLayer(0.4)
+    #mod.addStandardLayer(32)
+    #mod.addDropoutLayer(0.1)
     mod.createModel()
     mod.trainModel(1, 10)
     

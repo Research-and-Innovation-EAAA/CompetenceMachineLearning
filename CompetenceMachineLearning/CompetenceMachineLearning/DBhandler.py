@@ -36,14 +36,20 @@ class DBHandler:
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
+        allCorrectData = []
+        allIncorrectData = []
+
         correctAdverts = list(cursor)
         i = 0
         for row in correctAdverts:
-            if i < len(correctAdverts)*(6/10):
-                trainingAdverts.append(Advert(row[0], row[1], 1))
-            else:
-                testingAdverts.append(Advert(row[0], row[1], 1))
+            allCorrectData.append(Advert(row[0], row[1], 1))
             i += 1
+        #for row in correctAdverts:
+        #    if i < len(correctAdverts)*(6/10):
+        #        trainingAdverts.append(Advert(row[0], row[1], 1))
+        #    else:
+        #        testingAdverts.append(Advert(row[0], row[1], 1))
+        #    i += 1
         q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
@@ -51,13 +57,27 @@ class DBHandler:
         cnx.close()
         i = 0
         for row in incorrectAdverts:
-            if i < len(incorrectAdverts)*(6/10):
-                trainingAdverts.append(Advert(row[0], row[1], 0))
-            else:
-                testingAdverts.append(Advert(row[0], row[1], 0))
+            allIncorrectData.append(Advert(row[0], row[1], 0))
             i += 1
-        random.shuffle(trainingAdverts)
-        random.shuffle(testingAdverts)
+
+        #for row in incorrectAdverts:
+        #    if i < len(incorrectAdverts)*(6/10):
+        #        trainingAdverts.append(Advert(row[0], row[1], 0))
+        #    else:
+        #        testingAdverts.append(Advert(row[0], row[1], 0))
+        #    i += 1
+
+        random.shuffle(allCorrectData)
+        random.shuffle(allIncorrectData)
+
+        correct = int((len(allCorrectData)*(6/10)))
+        incorrect = int((len(allIncorrectData)*(6/10)))
+
+        trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
+        testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
+
+        #random.shuffle(trainingAdverts)
+        #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
     def loadAdvertDataTokenizer(self, competenceID):
@@ -67,14 +87,15 @@ class DBHandler:
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
+        allCorrectData = []
+        allIncorrectData = []
+
         correctAdverts = list(cursor)
         i = 0
         for row in correctAdverts:
-            if i < len(correctAdverts)*(6/10):
-                trainingAdverts.append(Advert(row[0], row[1], 1))
-            else:
-                testingAdverts.append(Advert(row[0], row[1], 1))
+            allCorrectData.append(Advert(row[0], row[1], 1))
             i += 1
+     
         q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
         incorrectAdverts = list(cursor)
@@ -82,13 +103,18 @@ class DBHandler:
         cnx.close()
         i = 0
         for row in incorrectAdverts:
-            if i < len(incorrectAdverts)*(6/10):
-                trainingAdverts.append(Advert(row[0], row[1], 0))
-            else:
-                testingAdverts.append(Advert(row[0], row[1], 0))
+            allIncorrectData.append(Advert(row[0], row[1], 0))
             i += 1
-        #random.shuffle(trainingAdverts)
-        #random.shuffle(testingAdverts)
+
+        random.shuffle(allCorrectData)
+        random.shuffle(allIncorrectData)
+
+        correct = int((len(allCorrectData)*(6/10)))
+        incorrect = int((len(allIncorrectData)*(6/10)))
+
+        trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
+        testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
+
         return trainingAdverts, testingAdverts
 
     def loadAdvertDataASCII(self, competenceID):
@@ -99,9 +125,13 @@ class DBHandler:
         cursor.execute(query)
         trainingAdverts = []
         testingAdverts = []
+        allCorrectData = []
+        allIncorrectData = []
+
         correctAdverts = list(cursor)
         print("Progress Update 2")
         i = 0
+
         for row in correctAdverts:
             chars = list(row[1])
             numbers = []
@@ -110,11 +140,22 @@ class DBHandler:
                 if asciiValue < 256:
                     #Oddly, a few values were found around 82xx. Looking here https://www.ascii.cl/htmlcodes.htm it seems there are some ascii codes above 255, however, none of these are relevant for this application.
                     numbers.append(str(ord(str(char))))
-            if i < len(correctAdverts)*(6/10):
-                trainingAdverts.append(Advert(row[0], numbers, 1))
-            else:
-                testingAdverts.append(Advert(row[0], numbers, 1))
+            allCorrectData.append(Advert(row[0], numbers, 1))
             i += 1
+
+        #for row in correctAdverts:
+        #    chars = list(row[1])
+        #    numbers = []
+        #    for char in chars:
+        #        asciiValue = ord(str(char))
+        #        if asciiValue < 256:
+        #            #Oddly, a few values were found around 82xx. Looking here https://www.ascii.cl/htmlcodes.htm it seems there are some ascii codes above 255, however, none of these are relevant for this application.
+        #            numbers.append(str(ord(str(char))))
+        #    if i < len(correctAdverts)*(6/10):
+        #        trainingAdverts.append(Advert(row[0], numbers, 1))
+        #    else:
+        #        testingAdverts.append(Advert(row[0], numbers, 1))
+        #    i += 1
         print("Progress Update 3")
         q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
         cursor.execute(q2)
@@ -122,6 +163,7 @@ class DBHandler:
         cursor.close()
         cnx.close()
         i = 0
+
         for row in incorrectAdverts:
             chars = list(row[1])
             numbers = []
@@ -129,14 +171,34 @@ class DBHandler:
                 asciiValue = ord(str(char))
                 if asciiValue < 256:
                     numbers.append(str(ord(str(char))))
-            if i < len(incorrectAdverts)*(6/10):
-                trainingAdverts.append(Advert(row[0], numbers, 0))
-            else:
-                testingAdverts.append(Advert(row[0], numbers, 0))
+            allIncorrectData.append(Advert(row[0], numbers, 0))
             i += 1
+
+        #for row in incorrectAdverts:
+        #    chars = list(row[1])
+        #    numbers = []
+        #    for char in chars:
+        #        asciiValue = ord(str(char))
+        #        if asciiValue < 256:
+        #            numbers.append(str(ord(str(char))))
+        #    if i < len(incorrectAdverts)*(6/10):
+        #        trainingAdverts.append(Advert(row[0], numbers, 0))
+        #    else:
+        #        testingAdverts.append(Advert(row[0], numbers, 0))
+        #    i += 1
         print("Progress Update 4")
-        random.shuffle(trainingAdverts)
-        random.shuffle(testingAdverts)
+
+        random.shuffle(allCorrectData)
+        random.shuffle(allIncorrectData)
+
+        correct = int((len(allCorrectData)*(6/10)))
+        incorrect = int((len(allIncorrectData)*(6/10)))
+
+        trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
+        testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
+
+        #random.shuffle(trainingAdverts)
+        #random.shuffle(testingAdverts)
         return trainingAdverts, testingAdverts
 
     def loadAdvertDataMulti(self):
