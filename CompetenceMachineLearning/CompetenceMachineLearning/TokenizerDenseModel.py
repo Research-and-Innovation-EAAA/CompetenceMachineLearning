@@ -9,20 +9,19 @@ from Competence import Competence
 from SingleCompetenceModel import SingleCompetenceModel
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 
-class TokenizerLSTMModel(SingleCompetenceModel): 
+class TokenizerDenseModel(SingleCompetenceModel): 
 
     def __init__(self, name, competenceID):
         SingleCompetenceModel.__init__(self, name, competenceID)
-        self.modelType = "TokenizedLSTM"
+        self.modelType = "Tokenized"
         db = DBhandler.DBHandler()
 
     def createModel(self):
         model = keras.Sequential()
-        model.add(keras.layers.Embedding(1000, 5, input_length=1000))
-        model.add(keras.layers.Dropout(0.3))
-        #model.add(keras.layers.Conv1D(4, 5, kernel_regularizer=keras.regularizers.l1(0.01), activation=tf.nn.relu))
-        model.add(keras.layers.MaxPooling1D(pool_size=4))
-        model.add(keras.layers.LSTM(5))
+        model.add(keras.layers.Dense(4, input_shape=(1000,), activation=tf.nn.relu))
+        if len(self.layerArray) != 0:
+            for x in self.layerArray:
+                model.add(x)
         model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
         model.summary()
         self.model = model
@@ -39,15 +38,13 @@ class TokenizerLSTMModel(SingleCompetenceModel):
             test_data.append(x.body)
             test_label.append(x.matchCurrentCompetence)
             
-        max_words = 20000
+        max_words = 1000
         tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
         tokenize.fit_on_texts(train_data) # only fit on train
-        
-        x_sequences = tokenize.texts_to_sequences(train_data)
-        y_sequences = tokenize.texts_to_sequences(test_data)
-        x_train = keras.preprocessing.sequence.pad_sequences(x_sequences, maxlen=1000)
-        x_test = keras.preprocessing.sequence.pad_sequences(y_sequences, maxlen=1000)
 
+        x_train = tokenize.texts_to_matrix(train_data)
+        x_test = tokenize.texts_to_matrix(test_data)
+        
         print(len(train_data))
         self.model.compile(optimizer=tf.train.AdamOptimizer(), 
                     loss='binary_crossentropy',
@@ -55,7 +52,7 @@ class TokenizerLSTMModel(SingleCompetenceModel):
 
         train_data_1 = int((len(x_train)*(1/10)))
         train_label_1 = int((len(train_label)*(1/10)))
-        
+
         x_val = x_train[:train_data_1]
         partial_x_train = x_train[train_data_1:]
 
@@ -75,7 +72,7 @@ class TokenizerLSTMModel(SingleCompetenceModel):
 
         print('Test accuracy:', results)
 
-       
+
         import matplotlib.pyplot as plt
         acc = history.history['acc']
         val_acc = history.history['val_acc']

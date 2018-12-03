@@ -5,6 +5,7 @@ from NumberFormatModel import NumberFormatModel
 from ASCIIModel import ASCIIModel
 from TokenizerDenseModel import TokenizerDenseModel
 from TokenizerLSTMModel import TokenizerLSTMModel
+from MatrixExampleWith2Annonces import MatrixExampleWith2Annonces
 import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
@@ -52,13 +53,16 @@ if __name__ == '__main__':
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
     # 13013 - værdier
 
-    mod = TokenizerDenseModel("Testname", 12562)
+    mod = TokenizerLSTMModel("Testname", 13712)
     #mod.addStandardLayer(3)
     mod.addDropoutLayer(0.4)
     #mod.addStandardLayer(32)
     #mod.addDropoutLayer(0.1)
     mod.createModel()
-    mod.trainModel(1, 10)
+    mod.trainModel(1, 4)
+
+    #test = MatrixExampleWith2Annonces()
+    #test.printMatrix()
     
 
     #mod.saveModel()

@@ -32,6 +32,9 @@
     </Compile>
     <Compile Include="main.py" />
     <Compile Include="DBhandler.py" />
+    <Compile Include="MatrixExampleWith2Annonces.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SingleCompetenceModel.py">
       <SubType>Code</SubType>
     </Compile>
