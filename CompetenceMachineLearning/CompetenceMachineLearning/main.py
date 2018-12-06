@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
     # 13013 - værdier
 
-    mod = NumberFormatModel("Testname", 13712)
+    mod = TokenizerLSTMModel("Testname", 13712)
     mod.addStandardLayer(16)
     mod.addDropoutLayer(0.1)
     mod.addStandardLayer(8)
