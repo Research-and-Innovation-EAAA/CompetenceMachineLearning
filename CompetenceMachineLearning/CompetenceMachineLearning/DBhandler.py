@@ -159,7 +159,6 @@ class DBHandler:
         testingAdverts = []
         cnx = self.__createConnection()
         cursor = cnx.cursor()
-        #query1 = "SELECT a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =12551 or ak.kompetence_id = 12562 or ak.kompetence_id = 13727"
         query1 ="SELECT a._id, a.searchable_body FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =150388 or ak.kompetence_id = 165432 or ak.kompetence_id = 13727"
         cursor.execute(query1)
         searchableBodyCursor = list(cursor)

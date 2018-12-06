@@ -54,24 +54,10 @@ if __name__ == '__main__':
     # 13013 - værdier
 
     mod = TokenizerLSTMModel("Testname", 13712)
-    #mod.addStandardLayer(3)
     mod.addDropoutLayer(0.4)
-    #mod.addStandardLayer(32)
-    #mod.addDropoutLayer(0.1)
     mod.createModel()
     mod.trainModel(1, 4)
 
-    #test = MatrixExampleWith2Annonces()
-    #test.printMatrix()
-    
-
-    #mod.saveModel()
-
-    #mod = MultipleOutputModel.MultipleOutputModel()
-    #mod.trainModel()
-
-    #mod = SingleCompetenceModel.loadModel(13712, "Testname", "NumberFormatted")
-    #testLoadedModel(mod)
     
 
 
