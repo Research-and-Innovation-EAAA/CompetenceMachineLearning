@@ -37,7 +37,7 @@ class SingleCompetenceModel(object):
         db = DBhandler.DBHandler()
         from ASCIIModel import ASCIIModel
         from NumberFormatModel import NumberFormatModel
-        from TokenizerModel import TokenizerModel
+        from TokenizerDenseModel import TokenizerDenseModel
         from TokenizerLSTMModel import TokenizerLSTMModel
         model = db.loadModel(competenceID, name, type)
         mod = None

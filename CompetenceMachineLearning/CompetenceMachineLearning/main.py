@@ -3,8 +3,9 @@ from Competence import Competence
 from SingleCompetenceModel import SingleCompetenceModel
 from NumberFormatModel import NumberFormatModel
 from ASCIIModel import ASCIIModel
-from TokenizerModel import TokenizerModel
+from TokenizerDenseModel import TokenizerDenseModel
 from TokenizerLSTMModel import TokenizerLSTMModel
+from MatrixExampleWith2Annonces import MatrixExampleWith2Annonces
 import MultipleOutputModel
 import tensorflow as tf
 from tensorflow import keras
@@ -53,21 +54,10 @@ if __name__ == '__main__':
     # 13013 - værdier
 
     mod = TokenizerLSTMModel("Testname", 13712)
-    mod.addStandardLayer(16)
-    mod.addDropoutLayer(0.1)
-    mod.addStandardLayer(8)
-    mod.addDropoutLayer(0.1)
+    mod.addDropoutLayer(0.4)
     mod.createModel()
-    mod.trainModel(1, 50)
-    
+    mod.trainModel(1, 4)
 
-    #mod.saveModel()
-
-    #mod = MultipleOutputModel.MultipleOutputModel()
-    #mod.trainModel()
-
-    #mod = SingleCompetenceModel.loadModel(13712, "Testname", "NumberFormatted")
-    #testLoadedModel(mod)
     
 
 

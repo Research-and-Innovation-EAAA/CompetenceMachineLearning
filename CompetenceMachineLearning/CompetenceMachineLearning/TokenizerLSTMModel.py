@@ -18,9 +18,8 @@ class TokenizerLSTMModel(SingleCompetenceModel):
 
     def createModel(self):
         model = keras.Sequential()
-        model.add(keras.layers.Embedding(20000, 5, input_length=1000))
+        model.add(keras.layers.Embedding(1000, 5, input_length=1000))
         model.add(keras.layers.Dropout(0.3))
-        model.add(keras.layers.Conv1D(4, 5, kernel_regularizer=keras.regularizers.l1(0.01), activation=tf.nn.relu))
         model.add(keras.layers.MaxPooling1D(pool_size=4))
         model.add(keras.layers.LSTM(5))
         model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
@@ -39,7 +38,7 @@ class TokenizerLSTMModel(SingleCompetenceModel):
             test_data.append(x.body)
             test_label.append(x.matchCurrentCompetence)
             
-        max_words = 20000
+        max_words = 1000
         tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
         tokenize.fit_on_texts(train_data) # only fit on train
         
