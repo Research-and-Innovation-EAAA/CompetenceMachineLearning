@@ -101,3 +101,25 @@ class TokenizerDenseModel(SingleCompetenceModel):
         plt.legend()
 
         plt.show()
+
+    def matchSome():
+        training, test = self.db.loadAdvertDataTokenizer(self.competenceID)
+        bodies, labels, ids   = [], [], []
+        data = training + test
+
+
+        for x in data:
+            bodies.append(x.body)
+            labels.append(x.matchCurrentCompetence)
+            ids.append(x._id)
+            
+        max_words = 1000
+        tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
+        tokenize.fit_on_texts(bodies) # only fit on train
+
+        readyBodies = tokenize.texts_to_matrix(bodies)
+
+
+        predictions = self.model.predict(np.array(readyBodies))
+
+        print(predictions)
