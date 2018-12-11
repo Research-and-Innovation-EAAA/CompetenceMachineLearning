@@ -53,10 +53,10 @@ if __name__ == '__main__':
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
     # 13013 - værdier
 
-    mod = TokenizerLSTMModel("Testname", 13712)
+    mod = TokenizerDenseModel("Testname", 12562)
     mod.addDropoutLayer(0.4)
     mod.createModel()
-    mod.trainModel(1, 4)
+    mod.trainModel(1, 14)
 
     
 
