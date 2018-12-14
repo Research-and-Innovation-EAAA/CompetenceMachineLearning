@@ -178,25 +178,32 @@ class DBHandler:
         cnx.close()
         return trainingAdverts, testingAdverts
 
-    def storeMatches(self, competenceID, advertIDs, modelID):
+    def storeMatches(self, competenceID, advertIDs):
         cnx = self.__createConnection()
         cursor = cnx.cursor()
+        q = "select annonce_id from annonce_kompetence_machine where kompetence_id = " + str(competenceID)
+        cursor.execute(q)
+        for row in list(cursor):
+            if row[0] in advertIDs:
+                advertIDs.remove(row[0])
+        
         # There is a limit on the values clause, only 1000 rows can be inserted at a time. Making a loop to generate multiple queries as needed.
         # No need to check if the kompetence-annonce match exists already, the unique index on the table should prevent duplicate rows from being added.
         i = 0
         while i < len(advertIDs):
-            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id, model_id) values "
+            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id) values "
             j = 0
             done = False
             while (j < 950) and (not done):
                 if i + j < len(advertIDs):
                     if j == 0:
-                        query += "(" + competenceID + ", " + advertIDs[i+j] + ", " + modelID + ")"
+                        query += "(" + str(competenceID) + ", " + str(advertIDs[i+j]) + ")"
                     else:
-                        query += ", (" + competenceID + ", " + advertIDs[i+j] + ", " + modelID + ")"
+                        query += ", (" + str(competenceID) + ", " + str(advertIDs[i+j]) + ")"
                 else:
                     done = True
                 j += 1
+            print("About to execute query")
             cursor.execute(query)
             i += 950
         cnx.commit()

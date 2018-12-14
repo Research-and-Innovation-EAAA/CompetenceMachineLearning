@@ -27,7 +27,7 @@ class SingleCompetenceModel(object):
     #TODO: See how much of trainModel is shared and put it into this superclass somehow.
 
     def saveModel(self):
-        if modelType != None:
+        if self.modelType != None:
             self.db.saveModel(self.name, self.modelType, self.model, self.competenceID)
         
     @staticmethod
@@ -46,7 +46,7 @@ class SingleCompetenceModel(object):
         elif type == "NumberFormatted":
             mod = NumberFormatModel(name, competenceID)
         elif type == "Tokenized":
-            mod = TokenizerModel(name, competenceID)
+            mod = TokenizerDenseModel(name, competenceID)
         elif type == "TokenizedLSTM":
             mod = TokenizerLSTMModel(name, competenceID)
         else:

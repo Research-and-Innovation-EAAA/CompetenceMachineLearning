@@ -52,13 +52,25 @@ if __name__ == '__main__':
     # 13737 - C#
     # 13721 - Erlang        |Example chosen for the little amount of data, for error finding|
     # 13013 - værdier
+    # 13727 - JavaScript
 
-    mod = TokenizerDenseModel("Testname", 13721)
-    mod.addDropoutLayer(0.4)
+    mod = TokenizerDenseModel("Javascript Test", 13727)
+    mod.addDropoutLayer(0.2)
     mod.createModel()
     mod.trainModel(1, 20)
 
-    #mod.matchSome()
+    #mod.saveModel()
+
+    #mod2 = SingleCompetenceModel.loadModel(13727, "Javascript Test", "Tokenized")
+    training, test = db.loadAdvertDataTokenizer(mod2.competenceID)
+    data = training + test
+    bodies, ids   = [], []
+
+    for x in data:
+        bodies.append(x.body)
+        ids.append(x._id)
+
+    mod.match(bodies, ids)
 
 
 

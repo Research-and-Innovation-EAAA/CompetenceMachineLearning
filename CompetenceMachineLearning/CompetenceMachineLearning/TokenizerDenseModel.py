@@ -59,14 +59,7 @@ class TokenizerDenseModel(SingleCompetenceModel):
         y_val = train_label[:train_label_1]
         partial_y_train = train_label[train_label_1:]
 
-        checkpoint_path = "training_1/cp.ckpt"
-        checkpoint_dir = os.path.dirname(checkpoint_path)
-
-        # Create checkpoint callback
-        cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
-                                                 save_weights_only=True,
-                                                 verbose=1)
-        history = self.model.fit(partial_x_train, partial_y_train, epochs = int(epochs), verbose=int(verboseMod), validation_data=(x_val, y_val), callbacks = [cp_callback])
+        history = self.model.fit(partial_x_train, partial_y_train, epochs = int(epochs), verbose=int(verboseMod), validation_data=(x_val, y_val))
 
         results = self.model.evaluate(x_test, test_label)
 
@@ -102,24 +95,24 @@ class TokenizerDenseModel(SingleCompetenceModel):
 
         plt.show()
 
-    def matchSome():
-        training, test = self.db.loadAdvertDataTokenizer(self.competenceID)
-        bodies, labels, ids   = [], [], []
-        data = training + test
-
-
-        for x in data:
-            bodies.append(x.body)
-            labels.append(x.matchCurrentCompetence)
-            ids.append(x._id)
-            
+    def match(self, bodies, ids):
         max_words = 1000
         tokenize = keras.preprocessing.text.Tokenizer(num_words=max_words, char_level=False)
-        tokenize.fit_on_texts(bodies) # only fit on train
+        tokenize.fit_on_texts(bodies)
 
         readyBodies = tokenize.texts_to_matrix(bodies)
 
-
         predictions = self.model.predict(np.array(readyBodies))
 
-        print(predictions)
+        goodMatches = []
+        i = 0
+        for val in predictions:
+            if val > 0.8:
+                if ids[i] not in goodMatches:
+                    goodMatches.append(ids[i])
+            i += 1;
+
+        print(len(goodMatches))
+        self.db.storeMatches(self.competenceID, goodMatches)
+                
+                
