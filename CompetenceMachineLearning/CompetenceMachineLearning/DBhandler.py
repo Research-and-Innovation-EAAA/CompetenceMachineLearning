@@ -1,282 +1,247 @@
 import mysql.connector
+from keras_preprocessing.text import tokenizer_from_json
 from mysql.connector import errorcode
 import os
-import yaml
-from Competence import Competence
-from Advert import Advert 
-from MultipleAdverts import MultipleAdverts
+from Advert import Advert
 import random
 import json
-import tensorflow
 from tensorflow import keras
-import numpy
+
 
 class DBHandler:
 
-    def __createConnection(self):
-        my_path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(my_path, "../config.yml")
-        config = yaml.safe_load(open(path))
+    def __create_connection(self):
         try:
-            cnx = mysql.connector.connect(**config)
+            cnx = mysql.connector.connect(user=os.environ['MYSQL_USER'], password=os.environ['MYSQL_PASSWORD'],
+                                          host=os.environ['MYSQL_HOST'],
+                                          database=os.environ['MYSQL_DATABASE'], port=os.environ['MYSQL_PORT'])
         except mysql.connector.Error as err:
-             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                 print("Something is wrong with your user name or password")
-             elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                 print("Database does not exist")
-             else:
-                 print(err)
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Database access denied")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print(err)
         else:
             return cnx
-    
-    def loadAdvertDataNumberFormat(self, competenceID):
-        cnx = self.__createConnection()
+
+    def load_advert_count(self):
+        cnx = self.__create_connection()
         cursor = cnx.cursor()
-        query = "select a._id, a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.numberFormat_body is not NULL"
+
+        cursor.execute("SELECT count(*) FROM annonce")
+        res = cursor.fetchone()[0]
+
+        cursor.close()
+        cnx.close()
+
+        return res
+
+    def insert_advert(self, competence_id, advert_id):
+        cnx = self.__create_connection()
+        cursor = cnx.cursor()
+
+        query = "INSERT IGNORE INTO annonce_kompetence_machine(annonce_id, kompetence_id) VALUES({0}, {1})".format(advert_id, competence_id)
+        print(query)
+
         cursor.execute(query)
-        trainingAdverts = []
-        testingAdverts = []
-        allCorrectData = []
-        allIncorrectData = []
+        cnx.commit()
 
-        correctAdverts = list(cursor)
-        i = 0
-        for row in correctAdverts:
-            allCorrectData.append(Advert(row[0], row[1], 1))
-            i += 1
-        q2 = "select a._id , a.numberFormat_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.numberFormat_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
-        cursor.execute(q2)
-        incorrectAdverts = list(cursor)
         cursor.close()
         cnx.close()
-        i = 0
-        for row in incorrectAdverts:
-            allIncorrectData.append(Advert(row[0], row[1], 0))
-            i += 1
 
-        random.shuffle(allCorrectData)
-        random.shuffle(allIncorrectData)
-
-        correct = int((len(allCorrectData)*(6/10)))
-        incorrect = int((len(allIncorrectData)*(6/10)))
-
-        trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
-        testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
-
-        return trainingAdverts, testingAdverts
-
-    def loadAdvertDataTokenizer(self, competenceID):
-        cnx = self.__createConnection()
+    def load_advert_data(self, batch_size, offset):
+        adverts = []
+        cnx = self.__create_connection()
         cursor = cnx.cursor()
-        query = "select a._id, a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.searchable_body is not NULL"
+
+        count = 0
+        query = 'SELECT a._id, a.searchable_body FROM annonce a LIMIT {0} OFFSET {1}'.format(batch_size, offset)
+        print(query)
         cursor.execute(query)
-        trainingAdverts = []
-        testingAdverts = []
-        allCorrectData = []
-        allIncorrectData = []
+        searchable_body = list(cursor)
+        for row in searchable_body:
+            adverts.append(Advert(advert_id=row[0], body=row[1], competence=""))
 
-        correctAdverts = list(cursor)
-        i = 0
-        for row in correctAdverts:
-            allCorrectData.append(Advert(row[0], row[1], 1))
-            i += 1
-     
-        q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
-        cursor.execute(q2)
-        incorrectAdverts = list(cursor)
-        cursor.close()
-        cnx.close()
-        i = 0
-        for row in incorrectAdverts:
-            allIncorrectData.append(Advert(row[0], row[1], 0))
-            i += 1
-
-        random.shuffle(allCorrectData)
-        random.shuffle(allIncorrectData)
-
-        correct = int((len(allCorrectData)*(6/10)))
-        incorrect = int((len(allIncorrectData)*(6/10)))
-
-        trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
-        testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
-
-        return trainingAdverts, testingAdverts
-
-    def loadAdvertDataASCII(self, competenceID):
-        cnx = self.__createConnection()
-        cursor = cnx.cursor()
-        query = "select a._id, a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id = " + str(competenceID) + " and a.searchable_body is not null"
-        cursor.execute(query)
-        trainingAdverts = []
-        testingAdverts = []
-        allCorrectData = []
-        allIncorrectData = []
-
-        correctAdverts = list(cursor)
-        i = 0
-
-        for row in correctAdverts:
-            chars = list(row[1])
-            numbers = []
-            for char in chars:
-                asciiValue = ord(str(char))
-                if asciiValue < 256:
-                    #Oddly, a few values were found around 82xx. Looking here https://www.ascii.cl/htmlcodes.htm it seems there are some ascii codes above 255, however, none of these are relevant for this application.
-                    numbers.append(str(ord(str(char))))
-            allCorrectData.append(Advert(row[0], numbers, 1))
-            i += 1
-
-        q2 = "select a._id , a.searchable_body from annonce a, annonce_kompetence ak where a._id = ak.annonce_id and ak.kompetence_id != " + str(competenceID) + " and a.searchable_body is not NULL group by a._id order by a._id desc limit " + str(len(correctAdverts))
-        cursor.execute(q2)
-        incorrectAdverts = list(cursor)
-        cursor.close()
-        cnx.close()
-        i = 0
-
-        for row in incorrectAdverts:
-            chars = list(row[1])
-            numbers = []
-            for char in chars:
-                asciiValue = ord(str(char))
-                if asciiValue < 256:
-                    numbers.append(str(ord(str(char))))
-            allIncorrectData.append(Advert(row[0], numbers, 0))
-            i += 1
-
-        random.shuffle(allCorrectData)
-        random.shuffle(allIncorrectData)
-
-        correct = int((len(allCorrectData)*(6/10)))
-        incorrect = int((len(allIncorrectData)*(6/10)))
-
-        trainingAdverts = allCorrectData[:correct] + allIncorrectData[:incorrect]
-        testingAdverts = allCorrectData[correct:] + allIncorrectData[incorrect:]
-
-        return trainingAdverts, testingAdverts
-
-    def loadAdvertDataMulti(self):
-        trainingAdverts = []
-        testingAdverts = []
-        cnx = self.__createConnection()
-        cursor = cnx.cursor()
-        query1 ="SELECT a._id, a.searchable_body FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id =150388 or ak.kompetence_id = 165432 or ak.kompetence_id = 13727"
-        cursor.execute(query1)
-        searchableBodyCursor = list(cursor)
-        i = 0
-        for row in searchableBodyCursor:
-            queryCompetencelist ="SELECT k.prefferredLabel FROM annonce_kompetence ak JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.annonce_id = " + str(row[0])
-            cursor.execute(queryCompetencelist)
-            competences = list(cursor)
-            if i < len(searchableBodyCursor)*(6/10):
-                trainingAdverts.append(MultipleAdverts(row[1], competences))
-            else:
-                testingAdverts.append(MultipleAdverts(row[1], competences))
-
-        random.shuffle(trainingAdverts)
-        random.shuffle(testingAdverts)
-        cursor.close()
-        cnx.close()
-        return trainingAdverts, testingAdverts
-
-    def storeMatches(self, competenceID, advertIDs):
-        cnx = self.__createConnection()
-        cursor = cnx.cursor()
-        q = "select annonce_id from annonce_kompetence_machine where kompetence_id = " + str(competenceID)
-        cursor.execute(q)
-        for row in list(cursor):
-            if row[0] in advertIDs:
-                advertIDs.remove(row[0])
-        
-        # There is a limit on the values clause, only 1000 rows can be inserted at a time. Making a loop to generate multiple queries as needed.
-        # No need to check if the kompetence-annonce match exists already, the unique index on the table should prevent duplicate rows from being added.
-        i = 0
-        while i < len(advertIDs):
-            query = "insert into annonce_kompetence_machine(kompetence_id, annonce_id) values "
-            j = 0
-            done = False
-            while (j < 950) and (not done):
-                if i + j < len(advertIDs):
-                    if j == 0:
-                        query += "(" + str(competenceID) + ", " + str(advertIDs[i+j]) + ")"
-                    else:
-                        query += ", (" + str(competenceID) + ", " + str(advertIDs[i+j]) + ")"
-                else:
-                    done = True
-                j += 1
-            print("About to execute query")
+        for offset in range(0, count, batch_size):
+            query = 'SELECT a._id, a.searchable_body FROM annonce a LIMIT {0} OFFSET {1}'.format(batch_size, offset)
+            print(query)
             cursor.execute(query)
-            i += 950
-        cnx.commit()
+            searchable_body = list(cursor)
+            for row in searchable_body:
+                adverts.append(Advert(advert_id=row[0], body=row[1], competence=""))
+
         cursor.close()
         cnx.close()
 
-    def loadDictionaryLength(self):
-        cnx = self.__createConnection()
-        cursor = cnx.cursor()
-        cursor.execute("select count(_id) from machine_word_dictionary")
-        return cursor.fetchone()[0]
+        return adverts
 
-    def saveModel(self, modelName, modelType, model, competenceID):
-        cnx = self.__createConnection()
+    def load_advert_data_binary_classification(self, competence_id):
+        training_adverts = []
+        testing_adverts = []
+
+        # 13712 = Java programmør
+        # 146798 = Grafisk Design
+        # 32286 = Butiksassistent
+        # 43754 = Tømrer
+
+        cnx = self.__create_connection()
         cursor = cnx.cursor()
-        modelJSON = str(model.to_json())
-        numArray = model.get_weights()
-        listJson = [[]]
-        for x in numArray:
-            listJson.append(x.tolist())
-        weightsJSON = json.dumps(listJson)
-        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "' and type = '" + modelType + "'")
-        if (len(list(cursor)) == 0):
-            cursor.execute("insert into machine_model(kompetence_id, model, weights, name, type) values(" + str(competenceID) + ", '" + modelJSON + "', '" + weightsJSON + "', '" + modelName + "', '" + modelType + "')")
-        else:
-            cursor.execute("update machine_model set model = '" + modelJSON + "', weights = '" + weightsJSON + "' where kompetence_id = " + str(competenceID) + " and name = '" + modelName + "' and type = '" + modelType + "'")
-        cnx.commit()
+
+        query = "select a._id, a.searchable_body from annonce a join annonce_kompetence ak on a._id = ak.annonce_id where ak.kompetence_id = " + str(competence_id)
+        print(query)
+
+        cursor.execute(query)
+        searchable_body = list(cursor)
+
+        # Split into validation and training sets at ratio of 1:5
+        i = 0
+        for row in searchable_body:
+            if i % 5 == 0:
+                testing_adverts.append(Advert(advert_id=row[0], body=row[1], competence=1))
+            else:
+                training_adverts.append(Advert(advert_id=row[0], body=row[1], competence=1))
+            i += 1
+
+        query = "SELECT a._id, a.searchable_body FROM annonce a WHERE a._id NOT IN (SELECT annonce_id FROM annonce_kompetence ak WHERE kompetence_id = " + str(competence_id) + ") ORDER BY a._id DESC LIMIT " + str(len(searchable_body))
+        print(query)
+
+        cursor.execute(query)
+        searchable_body = list(cursor)
+
+        i = 0
+        for row in searchable_body:
+            if i % 5 == 0:
+                testing_adverts.append(Advert(advert_id=row[0], body=row[1], competence=0))
+            else:
+                training_adverts.append(Advert(advert_id=row[0], body=row[1], competence=0))
+            i += 1
+
+        print("total amount of adverts = " + str((len(testing_adverts) + len(training_adverts))))
+        print("test set length = " + str(len(testing_adverts)))
+        print("training set length = " + str(len(training_adverts)))
+
+        random.shuffle(training_adverts)
+        random.shuffle(testing_adverts)
+
         cursor.close()
         cnx.close()
-        
-    def loadModel(self, competenceID, name, type):
-        cnx = self.__createConnection()
+
+        return training_adverts, testing_adverts
+
+    def load_advert_data_multiple_classes(self):
+        training_adverts = []
+        testing_adverts = []
+        cnx = self.__create_connection()
         cursor = cnx.cursor()
-        cursor.execute("select model, weights from machine_model where name = '" + name + "' and kompetence_id = " + str(competenceID) + " and type = '" + type + "'")
-        row = cursor.fetchone()
-        modelJSON = row[0]
-        weightsJSON = row[1]
-        model = keras.models.model_from_json(modelJSON)
-        weights = json.loads(weightsJSON)
-        tmp = []
-        for list in weights:
-            tmp.append(numpy.array(list))
-        numpyWeights = numpy.array(tmp)
-        numpyWeights = numpy.delete(numpyWeights, 0, 0)
-        model.set_weights(numpyWeights)
+
+        # 13712 = Java programmør
+        # 146798 = Grafisk Design
+        # 32286 = Butiksassistent
+        # 43754 = Tømrer
+
+        competence_ids = [13712, 146798, 32286, 43754]
+
+        for _id in competence_ids:
+
+            query = "SELECT a._id, a.searchable_body, k.prefferredLabel FROM annonce a JOIN annonce_kompetence ak ON a._id = ak.annonce_id JOIN kompetence k ON k._id = ak.kompetence_id WHERE ak.kompetence_id = " + str(_id) + " LIMIT 4000"
+            print(query)
+            cursor.execute(query)
+
+            searchable_body = list(cursor)
+
+            i = 0
+            for row in searchable_body:
+                body = str(row[1])
+
+                # Split data into training and test sets.
+                if i % 5 == 0:
+                    testing_adverts.append(Advert(advert_id=row[0], body=body, competence=row[2]))
+                else:
+                    training_adverts.append(Advert(advert_id=row[0], body=body, competence=row[2]))
+                i = i + 1
+
+        print("total amount of adverts = " + str((len(testing_adverts) + len(training_adverts))))
+        print("test set length = " + str(len(testing_adverts)))
+        print("training set length = " + str(len(training_adverts)))
+
+        random.shuffle(training_adverts)
+        random.shuffle(testing_adverts)
+
+        cursor.close()
+        cnx.close()
+
+        return training_adverts, testing_adverts
+
+    def save_model(self, model, competence_id, tokenizer):
+        cnx = self.__create_connection()
+        cursor = cnx.cursor()
+
+        model_name = "kompetence_" + str(competence_id) + "_model.h5"
+        tokenizer_name = "kompetence_" + str(competence_id) + "_tokenizer.json"
+
+        model.save(model_name)
+        tokenizer_json = tokenizer.to_json()
+
+        # Save tokenizer to file.
+        with open(tokenizer_name, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(tokenizer_json, ensure_ascii=False))
+
+        # Insert model and tokenizer file names in database.
+        query = "insert into kompetence_machine (kompetence_id, model, tokenizer) values(" + str(competence_id) + ", '" + model_name + "', '" + tokenizer_name + "')"
+        print(query)
+
+        cursor.execute(query)
+        cnx.commit()
+
+        cursor.close()
+        cnx.close()
+
+    def load_model(self, model_id):
+        cnx = self.__create_connection()
+        cursor = cnx.cursor()
+
+        query = "select model from kompetence_machine where _id = " + str(model_id)
+        print(query)
+
+        cursor.execute(query)
+        model_name = str(list(cursor)[0][0])
+
+        model = keras.models.load_model(model_name)
+
         return model
 
-    def loadCompetences(self):
-        cnx = self.__createConnection()
+    def load_tokenizer(self, model_id):
+        cnx = self.__create_connection()
         cursor = cnx.cursor()
-        query = "select _id, prefferredLabel from kompetence"
+
+        query = "select tokenizer from kompetence_machine where _id = " + str(model_id)
+        print(query)
         cursor.execute(query)
-        competenceList = []
-        for row in cursor:
-            competenceList.append(Competence(row[0], row[1]))
-        cursor.close()
-        cnx.close()
-        return competenceList
-        
-    def loadCompetencesWithModels(self):
-        cnx = self.__createConnection()
+
+        tokenizer_name = str(list(cursor)[0][0])
+
+        with open(tokenizer_name) as f:
+            data = json.load(f)
+            tokenizer = tokenizer_from_json(data)
+
+        return tokenizer
+
+    def load_model_ids(self):
+        cnx = self.__create_connection()
         cursor = cnx.cursor()
-        cursor.execute("select k._id, k.prefferredLabel from kompetence k, machine_model mm where k._id = mm.kompetence_id group_by k._id")
-        competences = []
-        for row in cursor:
-            competences.append(Competence(row[0], row[1]))
-        return competences
-        
-    def loadModelNames(self, competenceID):
-        cnx = self.__createConnection()
-        cursor = cnx.cursor()
-        cursor.execute("select name from machine_model where kompetence_id = " + str(competenceID))
-        modelNames = []
-        for row in cursor:
-            modelNames.append(row[0])
-        return modelNames
+
+        query = "select _id, kompetence_id from kompetence_machine"
+        print(query)
+
+        cursor.execute(query)
+        res = list(cursor)
+
+        model_ids, competence_ids = [], []
+
+        for element in res:
+            model_ids.append(element[0])
+            competence_ids.append(element[1])
+
+        return model_ids, competence_ids
+
