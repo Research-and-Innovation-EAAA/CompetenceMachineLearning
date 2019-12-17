@@ -55,21 +55,13 @@ class DBHandler:
         cnx = self.__create_connection()
         cursor = cnx.cursor()
 
-        count = 0
         query = 'SELECT a._id, a.searchable_body FROM annonce a LIMIT {0} OFFSET {1}'.format(batch_size, offset)
         print(query)
         cursor.execute(query)
         searchable_body = list(cursor)
+
         for row in searchable_body:
             adverts.append(Advert(advert_id=row[0], body=row[1], competence=""))
-
-        for offset in range(0, count, batch_size):
-            query = 'SELECT a._id, a.searchable_body FROM annonce a LIMIT {0} OFFSET {1}'.format(batch_size, offset)
-            print(query)
-            cursor.execute(query)
-            searchable_body = list(cursor)
-            for row in searchable_body:
-                adverts.append(Advert(advert_id=row[0], body=row[1], competence=""))
 
         cursor.close()
         cnx.close()
